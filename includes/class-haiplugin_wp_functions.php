@@ -265,3 +265,32 @@ function haiplugin_wp_lang_detection_wp_form_callback() {
     </select>
     <?php
 }
+// Render "Select Field WP Form" select field
+function haiplugin_wp_lang_detection_wp_form_field_callback() {
+    ?>
+    <select name="haiplugin_wp_lang_detection_wp_form_field" id="haiplugin-wp-form-field-select">
+        <!-- Options will be populated using JavaScript -->
+    </select>
+    <?php
+}
+
+function haiplugin_wp_get_form_fields() {
+    $form_id = isset($_POST['form_id']) ? intval($_POST['form_id']) : 0;
+    $fields = array();
+
+    if (function_exists('wpforms')) {
+        $form = wpforms()->form->get($form_id);
+        if ($form) {
+            $form_data = wpforms_decode($form->post_content);
+            if (!empty($form_data['fields'])) {
+                foreach ($form_data['fields'] as $field) {
+                    $fields[$field['id']] = $field['label'];
+                }
+            }
+        }
+    }
+
+    echo json_encode($fields);
+    wp_die();
+}
+add_action('wp_ajax_get_wp_form_fields', 'haiplugin_wp_get_form_fields');
