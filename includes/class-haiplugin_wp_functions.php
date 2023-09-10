@@ -318,6 +318,7 @@ function haiplugin_wp_lang_detection_script() {
             document.getElementById('wpforms-form-461').addEventListener('submit', function (e) {
                 let message = document.getElementById('<?php echo esc_js($messageField); ?>').value;
                 message = message.split(' ').slice(0, 5).join(' ');
+                const providerName = '<?php echo esc_js($providerName); ?>'
                 console.log('language Detection Active 2');
                 const options = {
                     method: 'POST',
@@ -331,7 +332,7 @@ function haiplugin_wp_lang_detection_script() {
                         response_as_dict: true,
                         attributes_as_list: false,
                         show_original_response: false,
-                        providers: '<?php echo esc_js($providerName); ?>'
+                        providers: providerName
                     })
                 };
 
