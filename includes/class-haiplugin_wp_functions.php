@@ -29,7 +29,7 @@ function haiplugin_wp_lang_detection_settings_fields() {
     register_setting('haiplugin_wp_lang_detection_group', 'haiplugin_wp_lang_detection_settings');
 
     add_settings_section('haiplugin_wp_lang_detection_general_section', 'General Settings', null, 'haiplugin_wp_lang_detection_field');
-    add_settings_field('haiplugin_wp_lang_detection_enabled', 'Enable Plugin', 'haiplugin_wp_lang_detection_general_section_callback', 'haiplugin_wp_lang_detection_field', 'propfirm_ftplugin_general_section');
+    add_settings_field('haiplugin_wp_lang_detection_enabled', 'Enable Plugin', 'haiplugin_wp_lang_detection_enabled_callback', 'haiplugin_wp_lang_detection_field', 'propfirm_ftplugin_general_section');
 }
 add_action('admin_init', 'haiplugin_wp_lang_detection_settings_fields');
 
