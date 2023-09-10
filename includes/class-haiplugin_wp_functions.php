@@ -15,7 +15,7 @@ function haiplugin_wp_lang_detection_settings_page_content() {
         <form method="post" action="options.php">
             <?php
                 settings_fields('haiplugin_wp_lang_detection_settings');
-                do_settings_sections('haiplugin_wp_lang_detection_settings');
+                do_settings_sections('haiplugin_wp_lang_detection_field');
                 submit_button();
             ?>
         </form>
@@ -26,34 +26,12 @@ function haiplugin_wp_lang_detection_settings_page_content() {
 // Add plugin settings fields
 function haiplugin_wp_lang_detection_settings_fields() {
     // Example: Add the "Enable Plugin" setting field
-    add_settings_section(
-        'haiplugin_wp_lang_detection_general',
-        'General Settings',
-        'haiplugin_wp_lang_detection_general_section_callback',
-        'haiplugin_wp_lang_detection_settings'
-    );
-    add_settings_field(
-        'haiplugin_wp_lang_detection_enabled',
-        'Enable Plugin',
-        'haiplugin_wp_lang_detection_enabled_callback',
-        'haiplugin_wp_lang_detection_settings',
-        'haiplugin_wp_lang_detection_general'
-    );
-    // Register "Enable Plugin" setting
-    register_setting(
-        'haiplugin_wp_lang_detection_settings', // Option group
-        'haiplugin_wp_lang_detection_enabled',  // Option name
-        array(
-            'sanitize_callback' => 'sanitize_text_field'
-        )
-    );
+    register_setting('haiplugin_wp_lang_detection_group', 'haiplugin_wp_lang_detection_settings');
+
+    add_settings_section('haiplugin_wp_lang_detection_general_section', 'General Settings', null, 'haiplugin_wp_lang_detection_field');
+    add_settings_field('haiplugin_wp_lang_detection_enabled', 'Enable Plugin', 'haiplugin_wp_lang_detection_general_section_callback', 'haiplugin_wp_lang_detection_field', 'propfirm_ftplugin_general_section');
 }
 add_action('admin_init', 'haiplugin_wp_lang_detection_settings_fields');
-
-// Render general settings section callback
-function haiplugin_wp_lang_detection_general_section_callback() {
-    echo 'Configure the general settings Plugin.';
-}
 
 // Render "Enable Plugin" field
 function haiplugin_wp_lang_detection_enabled_callback() {
