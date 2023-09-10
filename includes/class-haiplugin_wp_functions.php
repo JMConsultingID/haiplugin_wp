@@ -315,8 +315,17 @@ function haiplugin_wp_lang_detection_script() {
     	console.log('language Detection Active 1');
         (function( $ ) {
             'use strict';
+            const submitButton = document.getElementById('wpforms-submit-<?php echo esc_js(str_replace('wpforms-form-', '', $contactForm)); ?>');
+            const textareaElement = document.getElementById('<?php echo esc_js($messageField); ?>');
+
+            // Re-enable the submit button when the textarea content changes
+            textareaElement.addEventListener('input', function() {
+                submitButton.disabled = false;
+            });
+
             document.getElementById('<?php echo esc_js($contactForm); ?>').addEventListener('submit', function (e) {
-                let message = document.getElementById('<?php echo esc_js($messageField); ?>').value;
+            	e.preventDefault();
+                let message = textareaElement.value;
                 message = message.split(' ').slice(0, 5).join(' ');
                 const providerName = '<?php echo esc_js($providerName); ?>'
                 console.log('language Detection Active 2');
@@ -340,7 +349,6 @@ function haiplugin_wp_lang_detection_script() {
                     .then(response => response.json())
                     .then(data => {
                         const detectedLanguage = data[providerName].items[0].language;
-                        const submitButton = document.getElementById('wpforms-submit-<?php echo esc_js(str_replace('wpforms-form-', '', $contactForm)); ?>');
                         if (detectedLanguage !== 'en') {
                             e.preventDefault();
                             const warningMessage = document.createElement('div');
@@ -352,7 +360,6 @@ function haiplugin_wp_lang_detection_script() {
                             console.log('language Detection Active 3 Success');
                         }
                         else{
-                        	submitButton.disabled = false;
                             this.submit();
                         }
                     })
@@ -360,7 +367,6 @@ function haiplugin_wp_lang_detection_script() {
                         console.error('Error:', error);
                         console.log('language Detection Active 4 Error');
                     });
-                    console.log('language Detection Active 5 End');
             });
         })( jQuery );
     </script>
