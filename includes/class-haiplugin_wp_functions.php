@@ -315,7 +315,7 @@ function haiplugin_wp_lang_detection_script() {
     	console.log('language Detection Active 1');
         (function( $ ) {
             'use strict';
-            document.getElementById('<?php echo esc_js($contactForm); ?>').addEventListener('submit', function (e) {
+            document.getElementById('wpforms-form-461').addEventListener('submit', function (e) {
                 let message = document.getElementById('<?php echo esc_js($messageField); ?>').value;
                 message = message.split(' ').slice(0, 5).join(' ');
                 console.log('language Detection Active 2');
