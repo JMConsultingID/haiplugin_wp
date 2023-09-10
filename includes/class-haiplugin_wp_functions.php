@@ -312,15 +312,13 @@ function haiplugin_wp_lang_detection_script() {
     $providerName = get_option('haiplugin_wp_lang_detection_provider');
     ?>
     <script>
+    	console.log('language Detection Active 1');
         (function( $ ) {
             'use strict';
-            const formElement = document.getElementById('<?php echo esc_js($contactForm); ?>');
-            const submitButton = formElement.querySelector('input[type="submit"], button[type="submit"]');
-
-            formElement.addEventListener('submit', function (e) {
+            document.getElementById('<?php echo esc_js($contactForm); ?>').addEventListener('submit', function (e) {
                 let message = document.getElementById('<?php echo esc_js($messageField); ?>').value;
                 message = message.split(' ').slice(0, 5).join(' ');
-
+                console.log('language Detection Active 2');
                 const options = {
                     method: 'POST',
                     headers: {
@@ -343,15 +341,19 @@ function haiplugin_wp_lang_detection_script() {
                         const detectedLanguage = data[providerName].items[0].language;
                         if (detectedLanguage !== 'en') {
                             e.preventDefault();
-                            submitButton.disabled = true;
-                            submitButton.value = "Please use English"; // Change the button text to inform the user
-                        } else {
-                            submitButton.disabled = false;
+                            const warningMessage = document.createElement('div');
+                            warningMessage.textContent = 'Please submit the form in English.';
+                            warningMessage.style.color = 'red';
+                            const textareaElement = document.getElementById('<?php echo esc_js($messageField); ?>');
+                            textareaElement.parentNode.insertBefore(warningMessage, textareaElement.nextSibling);
+                            console.log('language Detection Active 3 Success');
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
+                        console.log('language Detection Active 4 Error');
                     });
+                    console.log('language Detection Active 5 End');
             });
         })( jQuery );
     </script>
