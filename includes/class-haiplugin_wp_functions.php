@@ -9,7 +9,7 @@ add_action('admin_menu', 'haiplugin_wp_lang_detection_menu');
 function haiplugin_wp_lang_detection_settings_page_content() {
     ?>
     <div class="wrap">
-        <h2>Hai Plugin</h2>
+        <h2>Hai Plugin - Language Detection Form</h2>
         <p>Description of the Plugin</p>
         <a href="https://app.edenai.run/bricks/translation/language-detection" target="_blank">Documentation and Pricing Provider</a>
         <form method="post" action="options.php">
@@ -29,7 +29,7 @@ function haiplugin_wp_lang_detection_settings_fields() {
     add_settings_section(
         'haiplugin_wp_lang_detection_general',
         'General Settings',
-        '',
+        NULL,
         'haiplugin_wp_lang_detection_settings'
     );
     add_settings_field(
