@@ -298,6 +298,12 @@ if ($plugin_enabled === 'enable') {
     add_action('wp_footer', 'haiplugin_wp_lang_detection_script');
 }
 
+// Check if the plugin is enabled
+$plugin_enabled = get_option('haiplugin_wp_lang_detection_enabled');
+if ($plugin_enabled === 'enable') {
+    add_action('wp_footer', 'haiplugin_wp_lang_detection_script');
+}
+
 function haiplugin_wp_lang_detection_script() {
     $contactForm = get_option('haiplugin_wp_lang_detection_wp_form');
     $messageField = get_option('haiplugin_wp_lang_detection_wp_form_field');
@@ -308,7 +314,10 @@ function haiplugin_wp_lang_detection_script() {
     <script>
         (function( $ ) {
             'use strict';
-            document.getElementById('<?php echo esc_js($contactForm); ?>').addEventListener('submit', function (e) {
+            const formElement = document.getElementById('<?php echo esc_js($contactForm); ?>');
+            const submitButton = formElement.querySelector('input[type="submit"], button[type="submit"]');
+
+            formElement.addEventListener('submit', function (e) {
                 let message = document.getElementById('<?php echo esc_js($messageField); ?>').value;
                 message = message.split(' ').slice(0, 5).join(' ');
 
@@ -334,7 +343,10 @@ function haiplugin_wp_lang_detection_script() {
                         const detectedLanguage = data[providerName].items[0].language;
                         if (detectedLanguage !== 'en') {
                             e.preventDefault();
-                            alert('Please submit the form in English.');
+                            submitButton.disabled = true;
+                            submitButton.value = "Please use English"; // Change the button text to inform the user
+                        } else {
+                            submitButton.disabled = false;
                         }
                     })
                     .catch(error => {
