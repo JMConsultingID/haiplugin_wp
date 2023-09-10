@@ -38,8 +38,7 @@ function haiplugin_wp_lang_detection_settings_fields() {
         'haiplugin_wp_lang_detection_settings', // Option group
         'haiplugin_wp_lang_detection_enabled',  // Option name
         array(
-            'type' => 'string',
-            'sanitize_callback' => 'haiplugin_wp_lang_detection_sanitize_enabled'
+            'sanitize_callback' => 'sanitize_text_field'
         )
     );
 }
