@@ -292,3 +292,56 @@ function haiplugin_wp_lang_detection_wp_form_field_callback() {
 }
 
 
+// Check if the plugin is enabled
+$plugin_enabled = get_option('haiplugin_wp_lang_detection_enabled');
+if ($plugin_enabled === 'enable') {
+    add_action('wp_footer', 'haiplugin_wp_lang_detection_script');
+}
+
+function haiplugin_wp_lang_detection_script() {
+    $contactForm = get_option('haiplugin_wp_lang_detection_wp_form');
+    $messageField = get_option('haiplugin_wp_lang_detection_wp_form_field');
+    $authorization = get_option('haiplugin_wp_lang_detection_api_key');
+    $endpoint = get_option('haiplugin_wp_lang_detection_endpoint_url');
+    $providerName = get_option('haiplugin_wp_lang_detection_provider');
+    ?>
+    <script>
+        (function( $ ) {
+            'use strict';
+            document.getElementById('<?php echo esc_js($contactForm); ?>').addEventListener('submit', function (e) {
+                let message = document.getElementById('<?php echo esc_js($messageField); ?>').value;
+                message = message.split(' ').slice(0, 5).join(' ');
+
+                const options = {
+                    method: 'POST',
+                    headers: {
+                        accept: 'application/json',
+                        'content-type': 'application/json',
+                        authorization: 'Bearer <?php echo esc_js($authorization); ?>'
+                    },
+                    body: JSON.stringify({
+                        text: message,
+                        response_as_dict: true,
+                        attributes_as_list: false,
+                        show_original_response: false,
+                        providers: '<?php echo esc_js($providerName); ?>'
+                    })
+                };
+
+                fetch('<?php echo esc_url($endpoint); ?>', options)
+                    .then(response => response.json())
+                    .then(data => {
+                        const detectedLanguage = data[providerName].items[0].language;
+                        if (detectedLanguage !== 'en') {
+                            e.preventDefault();
+                            alert('Please submit the form in English.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            });
+        })( jQuery );
+    </script>
+    <?php
+}
