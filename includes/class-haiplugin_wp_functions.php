@@ -267,30 +267,25 @@ function haiplugin_wp_lang_detection_wp_form_callback() {
 }
 // Render "Select Field WP Form" select field
 function haiplugin_wp_lang_detection_wp_form_field_callback() {
-    ?>
-    <select name="haiplugin_wp_lang_detection_wp_form_field" id="haiplugin-wp-form-field-select">
-        <!-- Options will be populated using JavaScript -->
-    </select>
-    <?php
-}
+    $current_field = get_option('haiplugin_wp_lang_detection_wp_form_field');
+    $selected_form_id = get_option('haiplugin_wp_lang_detection_wp_form');
 
-function haiplugin_wp_get_form_fields() {
-    $form_id = isset($_POST['form_id']) ? intval($_POST['form_id']) : 0;
-    $fields = array();
-
-    if (function_exists('wpforms')) {
-        $form = wpforms()->form->get($form_id);
+    if ($selected_form_id) {
+        $form = wpforms()->form->get($selected_form_id);
         if ($form) {
-            $form_data = wpforms_decode($form->post_content);
-            if (!empty($form_data['fields'])) {
-                foreach ($form_data['fields'] as $field) {
-                    $fields[$field['id']] = $field['label'];
-                }
-            }
+            $fields = wpforms_decode($form->post_content);
+            ?>
+            <select name="haiplugin_wp_lang_detection_wp_form_field">
+                <?php foreach ($fields['fields'] as $field): ?>
+                    <option value="<?php echo esc_attr($field['id']); ?>" <?php selected($current_field, $field['id']); ?>><?php echo esc_html($field['label']); ?></option>
+                <?php endforeach; ?>
+            </select>
+            <?php
+        } else {
+            echo '<p>No fields found for the selected form.</p>';
         }
+    } else {
+        echo '<p>Please select a WP Form first.</p>';
     }
-
-    echo json_encode($fields);
-    wp_die();
 }
-add_action('wp_ajax_get_wp_form_fields', 'haiplugin_wp_get_form_fields');
+
