@@ -28,5 +28,26 @@
 	 * Although scripts in the WordPress core, Plugins and Themes may be
 	 * practising this, we should strive to set a better example in our own work.
 	 */
+jQuery(document).ready(function($) {
+    $('#haiplugin-wp-form-select').change(function() {
+        var formId = $(this).val();
+
+        // Make an AJAX request to fetch the fields of the selected form
+        $.post(ajaxurl, {
+            action: 'get_wp_form_fields',
+            form_id: formId
+        }, function(response) {
+            var fields = JSON.parse(response);
+            var options = '';
+
+            for (var key in fields) {
+                options += '<option value="' + key + '">' + fields[key] + '</option>';
+            }
+
+            $('#haiplugin-wp-form-field-select').html(options);
+        });
+    });
+});
+
 
 })( jQuery );
