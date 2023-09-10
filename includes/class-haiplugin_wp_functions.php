@@ -29,7 +29,7 @@ function haiplugin_wp_lang_detection_settings_fields() {
     add_settings_section(
         'haiplugin_wp_lang_detection_general',
         'General Settings',
-        'haiplugin_wp_lang_detection_general_section_callback',
+        '',
         'haiplugin_wp_lang_detection_settings'
     );
     add_settings_field(
