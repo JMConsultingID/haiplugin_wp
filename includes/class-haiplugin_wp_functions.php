@@ -26,6 +26,12 @@ function haiplugin_wp_lang_detection_settings_page_content() {
 // Add plugin settings fields
 function haiplugin_wp_lang_detection_settings_fields() {
     // Example: Add the "Enable Plugin" setting field
+    add_settings_section(
+        'haiplugin_wp_lang_detection_general',
+        'General Settings',
+        'haiplugin_wp_lang_detection_general_section_callback',
+        'haiplugin_wp_lang_detection_settings'
+    );
     add_settings_field(
         'haiplugin_wp_lang_detection_enabled',
         'Enable Plugin',
