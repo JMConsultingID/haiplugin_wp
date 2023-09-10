@@ -340,6 +340,7 @@ function haiplugin_wp_lang_detection_script() {
                     .then(response => response.json())
                     .then(data => {
                         const detectedLanguage = data[providerName].items[0].language;
+                        const submitButton = document.getElementById('wpforms-submit-<?php echo esc_js(str_replace('wpforms-form-', '', $contactForm)); ?>');
                         if (detectedLanguage !== 'en') {
                             e.preventDefault();
                             const warningMessage = document.createElement('div');
@@ -347,7 +348,12 @@ function haiplugin_wp_lang_detection_script() {
                             warningMessage.style.color = 'red';
                             const textareaElement = document.getElementById('<?php echo esc_js($messageField); ?>');
                             textareaElement.parentNode.insertBefore(warningMessage, textareaElement.nextSibling);
+                            submitButton.disabled = true;
                             console.log('language Detection Active 3 Success');
+                        }
+                        else{
+                        	submitButton.disabled = false;
+                            this.submit();
                         }
                     })
                     .catch(error => {
