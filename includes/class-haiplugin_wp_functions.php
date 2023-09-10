@@ -51,8 +51,8 @@ function haiplugin_wp_lang_detection_settings_fields() {
 add_action('admin_init', 'haiplugin_wp_lang_detection_settings_fields');
 
 // Render general settings section callback
-function jm_autocomplete_plugin_general_section_callback() {
-    echo 'Configure the general settings for Auto Complete Address Plugin.';
+function haiplugin_wp_lang_detection_general_section_callback() {
+    echo 'Configure the general settings Plugin.';
 }
 
 // Render "Enable Plugin" field
