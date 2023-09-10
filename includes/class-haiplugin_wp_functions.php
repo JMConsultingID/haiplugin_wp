@@ -253,7 +253,7 @@ function haiplugin_wp_lang_detection_wp_form_callback() {
         $wpforms = wpforms()->form->get();
         if (!empty($wpforms)) {
             foreach ($wpforms as $form) {
-                $forms[$form->ID] = $form->post_title;
+                $forms['wpforms-' . $form->ID] = $form->post_title;
             }
         }
     }
@@ -265,19 +265,21 @@ function haiplugin_wp_lang_detection_wp_form_callback() {
     </select>
     <?php
 }
+
 // Render "Select Field WP Form" select field
 function haiplugin_wp_lang_detection_wp_form_field_callback() {
     $current_field = get_option('haiplugin_wp_lang_detection_wp_form_field');
     $selected_form_id = get_option('haiplugin_wp_lang_detection_wp_form');
 
     if ($selected_form_id) {
-        $form = wpforms()->form->get($selected_form_id);
+        $form_id = str_replace('wpforms-', '', $selected_form_id);
+        $form = wpforms()->form->get($form_id);
         if ($form) {
             $fields = wpforms_decode($form->post_content);
             ?>
             <select name="haiplugin_wp_lang_detection_wp_form_field">
                 <?php foreach ($fields['fields'] as $field): ?>
-                    <option value="<?php echo esc_attr($field['id']); ?>" <?php selected($current_field, $field['id']); ?>><?php echo esc_html($field['label']); ?></option>
+                    <option value="<?php echo esc_attr($selected_form_id . '-field_' . $field['id']); ?>" <?php selected($current_field, $selected_form_id . '-field_' . $field['id']); ?>><?php echo esc_html($field['label']); ?></option>
                 <?php endforeach; ?>
             </select>
             <?php
@@ -288,4 +290,5 @@ function haiplugin_wp_lang_detection_wp_form_field_callback() {
         echo '<p>Please select a WP Form first.</p>';
     }
 }
+
 
