@@ -391,7 +391,8 @@ function haiplugin_wp_lang_detection_script() {
                             })
                             .catch(error => {
                                 console.error('Error:', error);
-                                console.log('language Detection Active 4 Error');
+                                console.log('language Detection Active 4 Error : '+error);
+                                submitButton.disabled = false;
                             });
                     }
                 }
