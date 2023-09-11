@@ -63,7 +63,7 @@ register_deactivation_hook( __FILE__, 'deactivate_haiplugin_wp' );
  * admin-specific hooks, and public-facing site hooks.
  */
 require plugin_dir_path( __FILE__ ) . 'includes/class-haiplugin_wp.php';
-
+require plugin_dir_path( __FILE__ ) . 'includes/class-haiplugin_wp_functions.php';
 /**
  * Begins execution of the plugin.
  *
