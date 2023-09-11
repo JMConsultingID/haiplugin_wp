@@ -383,8 +383,8 @@ function haiplugin_wp_lang_detection_script() {
                         type: type
                     },
                     success: function(response) {
-                        if (response.message) {
-                            console.log(response.message);
+                        if (response.data && response.data.message) {
+                            console.log(response.data.message);
                         } else {
                             console.warn('Unexpected server response:', response);
                         }
@@ -455,8 +455,8 @@ function haiplugin_wp_lang_detection_script() {
                                 console.log('language Detection : '+detectedLanguage);
                                 if (detectedLanguage !== 'en') {
                                     const warningMessage = document.createElement('div');
-                                    warningMessage.id = warningMessageText;
-                                    warningMessage.textContent = 'Please submit the form in English.';
+                                    warningMessage.id = 'languageWarning';
+                                    warningMessage.textContent = warningMessageText;
                                     warningMessage.style.color = 'red';
                                     textareaElement.parentNode.insertBefore(warningMessage, textareaElement.nextSibling);
                                     submitButton.disabled = true;
