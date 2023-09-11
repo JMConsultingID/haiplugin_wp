@@ -457,7 +457,6 @@ function haiplugin_wp_lang_detection_script() {
                                     textareaElement.parentNode.insertBefore(warningMessage, textareaElement.nextSibling);
                                     submitButton.disabled = true;
                                     console.log('language Detection is not English : '+detectedLanguage);
-                                    sendLogToServer("2. Plugin received API if Language No English. Detected language: " + detectedLanguage);
                                 } else {
                                     removeWarningMessage();
                                     submitButton.disabled = false;
