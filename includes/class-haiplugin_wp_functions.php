@@ -374,6 +374,7 @@ function haiplugin_wp_lang_detection_script() {
                         fetch('<?php echo esc_url($endpoint); ?>', options)
                             .then(response => response.json())
                             .then(data => {
+                                console.log('language Detection Active 3 send Endpoint');
                                 const detectedLanguage = data[providerName].items[0].language;
                                 if (detectedLanguage !== 'en') {
                                     const warningMessage = document.createElement('div');
