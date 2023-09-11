@@ -339,19 +339,25 @@ function haiplugin_wp_lang_detection_wp_form_field_callback() {
     }
 }
 
-
-
-// Check if the plugin is enabled
-$plugin_enabled = get_option('haiplugin_wp_lang_detection_enabled');
-if ($plugin_enabled === 'enable') {
-    add_action('wp_footer', 'haiplugin_wp_lang_detection_script');
+function is_wpform_present($form_id) {
+    global $post;
+    if (is_a($post, 'WP_Post') && has_shortcode($post->post_content, 'wpforms') && strpos($post->post_content, 'id="' . $form_id . '"') !== false) {
+        return true;
+    }
+    return false;
 }
 
-// Check if the plugin is enabled
-$plugin_enabled = get_option('haiplugin_wp_lang_detection_enabled');
-if ($plugin_enabled === 'enable') {
-    add_action('wp_footer', 'haiplugin_wp_lang_detection_script');
+function haiplugin_wp_enqueue_scripts() {
+    $form_id = str_replace('wpforms-form-', '', get_option('haiplugin_wp_lang_detection_wp_form'));
+    $plugin_enabled = get_option('haiplugin_wp_lang_detection_enabled');
+    if (is_wpform_present($form_id)) {        
+        if ($plugin_enabled === 'enable') {
+            // Enqueue your scripts or inline scripts here
+            add_action('wp_footer', 'haiplugin_wp_lang_detection_script', 20);
+        }
+    }
 }
+add_action('wp_enqueue_scripts', 'haiplugin_wp_enqueue_scripts');
 
 function haiplugin_wp_lang_detection_script() {
     $contactForm = get_option('haiplugin_wp_lang_detection_wp_form');
