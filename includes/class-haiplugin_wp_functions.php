@@ -5,23 +5,6 @@ function haiplugin_wp_lang_detection_menu() {
     add_submenu_page('haiplugin-wp', 'Language Detection Form', 'Language Detection Form', 'manage_options', 'haiplugin-wp-lang-detection', 'haiplugin_wp_lang_detection_settings_page_content');
 }
 add_action('admin_menu', 'haiplugin_wp_lang_detection_menu');
-// Render settings page content
-function haiplugin_wp_lang_detection_settings_page_content() {
-    ?>
-    <div class="wrap">
-        <h2>Hai Plugin - Language Detection Form</h2>
-        <p>This plugin works to prevent spam by detecting the language in the message field on your form engine</p>
-        <a href="https://docs.edenai.co/reference/translation_language_detection_create" target="_blank">Documentation and Pricing Provider</a>
-        <form method="post" action="options.php">
-            <?php
-                settings_fields('haiplugin_wp_lang_detection_settings');
-                do_settings_sections('haiplugin_wp_lang_detection_settings');
-                submit_button();
-            ?>
-        </form>
-    </div>
-    <?php
-}
 
 // Render settings page content
 function haiplugin_wp_lang_detection_settings_page_content() {
