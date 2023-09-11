@@ -10,8 +10,8 @@ function haiplugin_wp_lang_detection_settings_page_content() {
     ?>
     <div class="wrap">
         <h2>Hai Plugin - Language Detection Form</h2>
-        <p>Description of the Plugin</p>
-        <a href="https://app.edenai.run/bricks/translation/language-detection" target="_blank">Documentation and Pricing Provider</a>
+        <p>This plugin works to prevent spam by detecting the language in the message field on your form engine</p>
+        <a href="https://docs.edenai.co/reference/translation_language_detection_create" target="_blank">Documentation and Pricing Provider</a>
         <form method="post" action="options.php">
             <?php
                 settings_fields('haiplugin_wp_lang_detection_settings');
@@ -22,6 +22,73 @@ function haiplugin_wp_lang_detection_settings_page_content() {
     </div>
     <?php
 }
+
+// Render settings page content
+function haiplugin_wp_lang_detection_settings_page_content() {
+    ?>
+    <div class="wrap">
+        <h2>Hai Plugin Settings</h2>
+
+        <!-- Plugin Description -->
+        <h3>Description</h3>
+        <p>This plugin is designed to prevent spam by detecting the language used in the message field of your form engine.<br/>
+        <a href="https://docs.edenai.co/reference/translation_language_detection_create" target="_blank">Documentation and Pricing Provider</a></p>
+
+        <!-- Installation Instructions -->
+        <h3>Installation Instructions</h3>
+        <ol>
+            <li><strong>Upload the Plugin:</strong>
+                <ul>
+                    <li>Download the plugin ZIP file.</li>
+                    <li>Navigate to your WordPress dashboard.</li>
+                    <li>Go to <code>Plugins > Add New > Upload Plugin</code>.</li>
+                    <li>Choose the downloaded ZIP file and click <code>Install Now</code>.</li>
+                </ul>
+            </li>
+            <li><strong>Activate the Plugin:</strong>
+                <ul>
+                    <li>After installation, click <code>Activate Plugin</code>.</li>
+                </ul>
+            </li>
+            <li><strong>Configure the Plugin:</strong>
+                <ul>
+                    <li>Navigate to the settings page of the plugin in your WordPress dashboard.</li>
+                    <li>Select the desired form engine and specify the message field where the language detection should occur.</li>
+                    <li>Enter the necessary API details for language detection.</li>
+                    <li>Save your settings.</li>
+                </ul>
+            </li>
+            <li><strong>Usage:</strong>
+                <ul>
+                    <li>Once configured, the plugin will automatically detect the language of the message field in the selected form engine.</li>
+                    <li>If the detected language is not the desired one (e.g., English), the plugin will prevent form submission and display an error message, helping to reduce spam.</li>
+                </ul>
+            </li>
+            <li><strong>Notes:</strong>
+                <ul>
+                    <li>Ensure that your form engine is compatible with this plugin.</li>
+                    <li>Regularly check the logs to monitor the plugin's activity and ensure it's working as expected.</li>
+                </ul>
+            </li>
+        </ol>
+
+        <!-- Plugin Settings Form -->
+        <h3>Plugin Settings</h3>
+        <form method="post" action="options.php">
+            <?php
+                settings_fields('haiplugin_wp_lang_detection_settings');
+                do_settings_sections('haiplugin_wp_lang_detection_settings');
+                submit_button();
+            ?>
+        </form>
+        <!-- Watermark Footer -->
+        <footer style="margin-top: 50px; font-size: 0.8em; text-align: center; opacity: 0.6;">
+            Developed by <a href="mailto:ardi@jm-consulting.id">ardi@jm-consulting.id</a>
+        </footer>
+    </div>
+    <?php
+}
+
 
 // Add plugin settings fields
 function haiplugin_wp_lang_detection_settings_fields() {
