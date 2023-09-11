@@ -373,7 +373,6 @@ function haiplugin_wp_lang_detection_script() {
             const wordThreshold = <?php echo $wordCount; ?>;
             const warningMessageText = "<?php echo esc_js($errorMessage); ?>";
 
-            // Fungsi untuk mengirim log ke server melalui AJAX
             function sendLogToServer(message, type = 'info') {
                 jQuery.ajax({
                     url: '<?php echo admin_url('admin-ajax.php'); ?>',
@@ -384,13 +383,18 @@ function haiplugin_wp_lang_detection_script() {
                         type: type
                     },
                     success: function(response) {
-                        console.log(response.message);
+                        if (response.message) {
+                            console.log(response.message);
+                        } else {
+                            console.warn('Unexpected server response:', response);
+                        }
                     },
                     error: function() {
                         console.error('Failed to send log to server.');
                     }
                 });
             }
+
 
             function debounce(func, wait) {
                 let timeout;
