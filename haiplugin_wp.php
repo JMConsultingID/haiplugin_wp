@@ -9,14 +9,14 @@
  * that starts the plugin.
  *
  * @link              https://haicreative.com
- * @since             1.0.0
+ * @since             1.0.1
  * @package           Haiplugin_wp
  *
  * @wordpress-plugin
  * Plugin Name:       Hai Plugins - Language Detection
  * Plugin URI:        https://haicreative.com
  * Description:       This plugin is to detect the language of the form field to avoid spam
- * Version:           1.0.0
+ * Version:           1.0.1
  * Author:            Ardika JM Consulting
  * Author URI:        https://haicreative.com
  * License:           GPL-2.0+
