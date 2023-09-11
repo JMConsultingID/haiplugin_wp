@@ -315,6 +315,7 @@ function haiplugin_wp_lang_detection_script() {
         console.log('language Detection Active 1');
         (function( $ ) {
             'use strict';
+
             const submitButton = document.getElementById('wpforms-submit-<?php echo esc_js(str_replace('wpforms-form-', '', $contactForm)); ?>');
             const textareaElement = document.getElementById('<?php echo esc_js($messageField); ?>');
 
@@ -326,62 +327,51 @@ function haiplugin_wp_lang_detection_script() {
                 }
             }
 
-            // Detect language after typing 5 words
-            textareaElement.addEventListener('input', function() {
-                let message = textareaElement.value;
-                const words = message.split(' ').filter(Boolean); // filter(Boolean) removes empty strings
-
-                removeWarningMessage(); // Remove warning message when textarea is revised
-
-                if (words.length >= 5) {
-                    message = words.slice(0, 5).join(' ');
-                    const providerName = '<?php echo esc_js($providerName); ?>';
-                    console.log('language Detection Active 2');
-
-                    const options = {
-                        method: 'POST',
-                        headers: {
-                            accept: 'application/json',
-                            'content-type': 'application/json',
-                            authorization: 'Bearer <?php echo esc_js($authorization); ?>'
-                        },
-                        body: JSON.stringify({
-                            text: message,
-                            response_as_dict: true,
-                            attributes_as_list: false,
-                            show_original_response: false,
-                            providers: providerName
-                        })
-                    };
-
-                    fetch('<?php echo esc_url($endpoint); ?>', options)
-                        .then(response => response.json())
-                        .then(data => {
-                            const detectedLanguage = data[providerName].items[0].language;
-                            if (detectedLanguage !== 'en') {
-                                const warningMessage = document.createElement('div');
-                                warningMessage.id = 'languageWarning';
-                                warningMessage.textContent = 'Please submit the form in English.';
-                                warningMessage.style.color = 'red';
-                                textareaElement.parentNode.insertBefore(warningMessage, textareaElement.nextSibling);
-                                submitButton.disabled = true;
-                                console.log('language Detection Active 3 Success');
-                            } else {
-                                removeWarningMessage(); // Remove warning message when textarea is revised
-                                submitButton.disabled = false;
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            console.log('language Detection Active 4 Error');
-                        });
-                }
-            });
-
             document.getElementById('<?php echo esc_js($contactForm); ?>').addEventListener('submit', function (e) {
-                if (submitButton.disabled) {
-                    e.preventDefault();
-                }
+                e.preventDefault();
+
+                let message = textareaElement.value;
+                message = message.split(' ').slice(0, 5).join(' ');
+                const providerName = '<?php echo esc_js($providerName); ?>';
+                removeWarningMessage(); // Remove warning message when textarea is revised
+                console.log('language Detection Active 2');
+
+                const options = {
+                    method: 'POST',
+                    headers: {
+                        accept: 'application/json',
+                        'content-type': 'application/json',
+                        authorization: 'Bearer <?php echo esc_js($authorization); ?>'
+                    },
+                    body: JSON.stringify({
+                        text: message,
+                        response_as_dict: true,
+                        attributes_as_list: false,
+                        show_original_response: false,
+                        providers: providerName
+                    })
+                };
+
+                fetch('<?php echo esc_url($endpoint); ?>', options)
+                    .then(response => response.json())
+                    .then(data => {
+                        const detectedLanguage = data[providerName].items[0].language;
+                        if (detectedLanguage !== 'en') {
+                            const warningMessage = document.createElement('div');
+                            warningMessage.textContent = 'Please submit the form in English.';
+                            warningMessage.style.color = 'red';
+                            textareaElement.parentNode.insertBefore(warningMessage, textareaElement.nextSibling);
+                            submitButton.disabled = true;
+                            console.log('language Detection Active 3 Success');
+                        } else {
+                            removeWarningMessage(); // Remove warning message when textarea is revised
+                            submitButton.disabled = false;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        console.log('language Detection Active 4 Error');
+                    });
             });
         })( jQuery );
     </script>
