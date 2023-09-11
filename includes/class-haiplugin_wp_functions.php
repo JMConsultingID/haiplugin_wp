@@ -372,6 +372,13 @@ function haiplugin_wp_lang_detection_script() {
             let lastCheckedText = ""; // To store the last checked 5 words
             const wordThreshold = <?php echo $wordCount; ?>;
             const warningMessageText = "<?php echo esc_js($errorMessage); ?>";
+            const messageFieldID <?php echo esc_js($messageField); ?>
+            const warningMessage = document.createElement('em');
+            warningMessage.id = messageFieldID + '-languageWarning';
+            warningMessage.className = 'wpforms-error-radius';
+            warningMessage.setAttribute('role', 'alert');
+            warningMessage.setAttribute('aria-label', 'Error message');
+            warningMessage.style.color = 'red';
 
             function sendLogToServer(message, type = 'info') {
                 jQuery.ajax({
@@ -411,7 +418,7 @@ function haiplugin_wp_lang_detection_script() {
 
             // Function to remove the warning message
             function removeWarningMessage() {
-                const existingWarning = document.getElementById('languageWarning');
+                const existingWarning = document.getElementById(messageFieldID + '-languageWarning');
                 if (existingWarning) {
                     existingWarning.remove();
                 }
@@ -454,11 +461,8 @@ function haiplugin_wp_lang_detection_script() {
                                 sendLogToServer("1. Plugin received API response. Detected language: " + detectedLanguage);
                                 console.log('language Detection : '+detectedLanguage);
                                 if (detectedLanguage !== 'en') {
-                                    const warningMessage = document.createElement('div');
-                                    warningMessage.id = 'languageWarning';
-                                    warningMessage.textContent = warningMessageText;
-                                    warningMessage.style.color = 'red';
                                     textareaElement.parentNode.insertBefore(warningMessage, textareaElement.nextSibling);
+                                    warningMessage.textContent = warningMessageText;
                                     submitButton.disabled = true;
                                     console.log('language Detection is not English : '+detectedLanguage);
                                 } else {
