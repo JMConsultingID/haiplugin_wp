@@ -76,6 +76,10 @@ function haiplugin_wp_lang_detection_settings_page_content() {
             <?php
                 settings_fields('haiplugin_wp_lang_detection_settings');
                 do_settings_sections('haiplugin_wp_lang_detection_settings');
+                ?>
+                <!-- Reset to Default Button -->
+                <input type="submit" name="haiplugin_wp_reset" id="reset" class="button button-secondary" value="Reset to Default">
+                <?php
                 submit_button();
             ?>
         </form>
@@ -86,6 +90,23 @@ function haiplugin_wp_lang_detection_settings_page_content() {
     </div>
     <?php
 }
+
+function haiplugin_wp_handle_reset() {
+    if (isset($_POST['haiplugin_wp_reset'])) {
+        update_option('haiplugin_wp_lang_detection_enabled', 'disable');
+        update_option('haiplugin_wp_lang_detection_endpoint_url', 'https://api.edenai.run/v2/translation/language_detection'); // Default value is an empty string
+        update_option('haiplugin_wp_lang_detection_api_key', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMmMyY2FkZDMtYmFkNS00MTkyLWE5OTEtNzAwMzJjMmUwYTI1IiwidHlwZSI6ImFwaV90b2tlbiJ9.qbIW8ot9u8cR5MgrP4pbTuV4hJqWCF_TyXcTkbCeikA'); // Default value is an empty string
+        update_option('haiplugin_wp_lang_detection_provider', 'microsoft'); // Default value is 'microsoft'
+        update_option('haiplugin_wp_lang_detection_language', 'en'); // Default value is 'en'
+        update_option('haiplugin_wp_lang_detection_word_count', '5 Words');
+        update_option('haiplugin_wp_lang_detection_error_message', 'Please submit the form in English.');
+        update_option('haiplugin_wp_lang_detection_form_engine', 'wpform'); // Default value is 'wpform'
+        wp_redirect(add_query_arg(['settings-updated' => 'true'], admin_url('options-general.php?page=your_plugin_settings_page_slug')));
+        exit;
+    }
+}
+add_action('admin_init', 'haiplugin_wp_handle_reset');
+
 
 
 // Add plugin settings fields
