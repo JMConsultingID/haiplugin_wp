@@ -373,6 +373,25 @@ function haiplugin_wp_lang_detection_script() {
             const wordThreshold = <?php echo $wordCount; ?>;
             const warningMessageText = "<?php echo esc_js($errorMessage); ?>";
 
+            // Fungsi untuk mengirim log ke server melalui AJAX
+            function sendLogToServer(message, type = 'info') {
+                jQuery.ajax({
+                    url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                    type: 'POST',
+                    data: {
+                        action: 'haiplugin_wp_log_action',
+                        message: message,
+                        type: type
+                    },
+                    success: function(response) {
+                        console.log(response.message);
+                    },
+                    error: function() {
+                        console.error('Failed to send log to server.');
+                    }
+                });
+            }
+
             function debounce(func, wait) {
                 let timeout;
                 return function() {
@@ -428,6 +447,7 @@ function haiplugin_wp_lang_detection_script() {
                             .then(response => response.json())
                             .then(data => {
                                 console.log('language Detection Active 3 send Endpoint');
+                                sendLogToServer("1. Plugin received API response. Detected language: " + detectedLanguage);
                                 const detectedLanguage = data[providerName].items[0].language;
                                 if (detectedLanguage !== 'en') {
                                     const warningMessage = document.createElement('div');
@@ -437,6 +457,7 @@ function haiplugin_wp_lang_detection_script() {
                                     textareaElement.parentNode.insertBefore(warningMessage, textareaElement.nextSibling);
                                     submitButton.disabled = true;
                                     console.log('language Detection Active 3 Success');
+                                    sendLogToServer("2. Plugin received API if Language No English. Detected language: " + detectedLanguage);
                                 } else {
                                     removeWarningMessage();
                                     submitButton.disabled = false;
@@ -445,6 +466,7 @@ function haiplugin_wp_lang_detection_script() {
                             .catch(error => {
                                 console.error('Error:', error);
                                 console.log('language Detection Active 4 Error : '+error);
+                                sendLogToServer("3. Plugin encountered an error: " + error, "error");
                                 removeWarningMessage();
                                 submitButton.disabled = false;
                             });
@@ -458,3 +480,25 @@ function haiplugin_wp_lang_detection_script() {
     </script>
     <?php
 }
+function haiplugin_wp_log($message, $type = 'info') {
+    $log_file = WP_CONTENT_DIR . '/haiplugin_wp_log.log'; // Lokasi file log di direktori wp-content
+
+    // Format pesan log
+    $log_message = date('Y-m-d H:i:s') . " [$type] $message" . PHP_EOL;
+
+    // Tambahkan pesan ke file log
+    error_log($log_message, 3, $log_file);
+}
+// Fungsi untuk menangani permintaan AJAX
+function haiplugin_wp_ajax_log_handler() {
+    $message = isset($_POST['message']) ? sanitize_text_field($_POST['message']) : '';
+    $type = isset($_POST['type']) ? sanitize_text_field($_POST['type']) : 'info';
+
+    haiplugin_wp_log($message, $type);
+
+    wp_send_json_success(['message' => 'Logged successfully']);
+}
+
+// Mendaftarkan handler AJAX untuk user yang logged in dan yang tidak
+add_action('wp_ajax_haiplugin_wp_log_action', 'haiplugin_wp_ajax_log_handler'); // Jika user logged in
+add_action('wp_ajax_nopriv_haiplugin_wp_log_action', 'haiplugin_wp_ajax_log_handler'); // Jika user tidak logged in
