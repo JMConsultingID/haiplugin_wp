@@ -201,7 +201,7 @@ function haiplugin_wp_lang_detection_general_section_callback() {
 
 // Render "Enable Plugin" field
 function haiplugin_wp_lang_detection_enabled_callback() {
-    $enabled = get_option('haiplugin_wp_lang_detection_enabled');
+    $enabled = get_option('haiplugin_wp_lang_detection_enabled', 'disable');
     ?>
     <select name="haiplugin_wp_lang_detection_enabled">
         <option value="enable" <?php selected($enabled, 'enable'); ?>>Enable</option>
@@ -212,7 +212,7 @@ function haiplugin_wp_lang_detection_enabled_callback() {
 
 // Render "Endpoint URL" field
 function haiplugin_wp_lang_detection_endpoint_url_callback() {
-    $endpoint_url = get_option('haiplugin_wp_lang_detection_endpoint_url', ''); // Default value is an empty string
+    $endpoint_url = get_option('haiplugin_wp_lang_detection_endpoint_url', 'https://api.edenai.run/v2/translation/language_detection'); // Default value is an empty string
     ?>
     <input type="text" name="haiplugin_wp_lang_detection_endpoint_url" value="<?php echo esc_attr($endpoint_url); ?>" class="regular-text">
     <p class="description">Enter the endpoint URL for the Edenai API.</p>
@@ -221,7 +221,7 @@ function haiplugin_wp_lang_detection_endpoint_url_callback() {
 
 // Render "API KEY" field
 function haiplugin_wp_lang_detection_api_key_callback() {
-    $api_key = get_option('haiplugin_wp_lang_detection_api_key', ''); // Default value is an empty string
+    $api_key = get_option('haiplugin_wp_lang_detection_api_key', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMmMyY2FkZDMtYmFkNS00MTkyLWE5OTEtNzAwMzJjMmUwYTI1IiwidHlwZSI6ImFwaV90b2tlbiJ9.qbIW8ot9u8cR5MgrP4pbTuV4hJqWCF_TyXcTkbCeikA'); // Default value is an empty string
     ?>
     <input type="text" name="haiplugin_wp_lang_detection_api_key" value="<?php echo esc_attr($api_key); ?>" class="regular-text">
     <p class="description">Enter your Edenai API key.</p>
@@ -274,7 +274,7 @@ function haiplugin_wp_lang_detection_word_count_callback() {
 
 // Callback for Error Message
 function haiplugin_wp_lang_detection_error_message_callback() {
-    $error_message = get_option('haiplugin_wp_lang_detection_error_message', '');
+    $error_message = get_option('haiplugin_wp_lang_detection_error_message', 'Please submit the form in English.');
     echo '<input type="text" name="haiplugin_wp_lang_detection_error_message" value="' . esc_attr($error_message) . '" class="regular-text">';
 }
 
