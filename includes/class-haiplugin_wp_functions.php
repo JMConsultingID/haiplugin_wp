@@ -1,10 +1,14 @@
 <?php
 // Add the plugin menu
+add_action('admin_menu', 'haiplugin_wp_lang_detection_menu');
 function haiplugin_wp_lang_detection_menu() {
-    add_menu_page('Hai Plugin', 'Hai Plugin', 'manage_options', 'haiplugin-wp', 'haiplugin_wp_lang_detection_settings_page_content');
+    add_menu_page('Hai Plugin', 'Hai Plugin', 'manage_options', 'haiplugin-wp', 'haiplugin_wp_lang_detection_main_content', 'dashicons-shield', 22);
     add_submenu_page('haiplugin-wp', 'Language Detection Form', 'Language Detection Form', 'manage_options', 'haiplugin-wp-lang-detection', 'haiplugin_wp_lang_detection_settings_page_content');
 }
-add_action('admin_menu', 'haiplugin_wp_lang_detection_menu');
+// Fungsi untuk menampilkan halaman settings
+function haiplugin_wp_lang_detection_main_content() {
+}
+
 
 // Render settings page content
 function haiplugin_wp_lang_detection_settings_page_content() {
