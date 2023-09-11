@@ -425,7 +425,7 @@ function haiplugin_wp_lang_detection_script() {
                     if (message !== lastCheckedText) { // Check if the first 5 words have changed
                         lastCheckedText = message; // Update the last checked text
                         const providerName = '<?php echo esc_js($providerName); ?>';
-                        console.log('language Detection Active 2');
+                        console.log('language Detection Preparing Data');
 
                         const options = {
                             method: 'POST',
@@ -445,10 +445,10 @@ function haiplugin_wp_lang_detection_script() {
 
                         fetch('<?php echo esc_url($endpoint); ?>', options)
                             .then(response => response.json())
-                            .then(data => {
-                                console.log('language Detection Active 3 send Endpoint');
-                                sendLogToServer("1. Plugin received API response. Detected language: " + detectedLanguage);
+                            .then(data => {                                
                                 const detectedLanguage = data[providerName].items[0].language;
+                                sendLogToServer("1. Plugin received API response. Detected language: " + detectedLanguage);
+                                console.log('language Detection : '+detectedLanguage);
                                 if (detectedLanguage !== 'en') {
                                     const warningMessage = document.createElement('div');
                                     warningMessage.id = warningMessageText;
@@ -456,7 +456,7 @@ function haiplugin_wp_lang_detection_script() {
                                     warningMessage.style.color = 'red';
                                     textareaElement.parentNode.insertBefore(warningMessage, textareaElement.nextSibling);
                                     submitButton.disabled = true;
-                                    console.log('language Detection Active 3 Success');
+                                    console.log('language Detection is not English : '+detectedLanguage);
                                     sendLogToServer("2. Plugin received API if Language No English. Detected language: " + detectedLanguage);
                                 } else {
                                     removeWarningMessage();
