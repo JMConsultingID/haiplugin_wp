@@ -7,16 +7,10 @@ function haiplugin_wp_lang_detection_menu() {
 }
 // Fungsi untuk menampilkan halaman settings
 function haiplugin_wp_lang_detection_main_content() {
-}
-
-
-// Render settings page content
-function haiplugin_wp_lang_detection_settings_page_content() {
+    $settings_link = admin_url('admin.php?page=haiplugin-wp-lang-detection');
     ?>
     <div class="wrap">
         <h2>Hai Plugin Settings</h2>
-
-        <!-- Plugin Description -->
         <h3>Description</h3>
         <p>This plugin is designed to prevent spam by detecting the language used in the message field of your form engine.<br/>
         <a href="https://docs.edenai.co/reference/translation_language_detection_create" target="_blank">Documentation and Pricing Provider</a></p>
@@ -55,12 +49,29 @@ function haiplugin_wp_lang_detection_settings_page_content() {
                 <ul>
                     <li>Ensure that your form engine is compatible with this plugin.</li>
                     <li>Regularly check the logs to monitor the plugin's activity and ensure it's working as expected.</li>
+                    <li>If you have any questions, please send an email to ardi@jm-consulting.id.</li>     
+                    <li>Enjoy Using this Plugin.</li>
                 </ul>
             </li>
         </ol>
 
-        <!-- Plugin Settings Form -->
-        <h3>Plugin Settings</h3>
+        <p>Setup Plugin :
+        <ol>
+            <li><a href="<?php echo esc_url($settings_link); ?>">Go to Language Detection Settings</a></li>
+        </ol>
+        <!-- Watermark Footer -->
+        <footer style="margin-top: 50px; font-size: 0.8em; text-align: center; opacity: 0.6;">
+            Developed by <a href="mailto:ardi@jm-consulting.id">ardi@jm-consulting.id</a>
+        </footer>
+    </div>
+    <?php
+}
+
+
+// Render settings page content
+function haiplugin_wp_lang_detection_settings_page_content() {
+    ?>
+    <div class="wrap">        
         <form method="post" action="options.php">
             <?php
                 settings_fields('haiplugin_wp_lang_detection_settings');
