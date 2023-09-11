@@ -323,6 +323,12 @@ function haiplugin_wp_lang_detection_script() {
                 let message = textareaElement.value;
                 const words = message.split(' ').filter(Boolean); // filter(Boolean) removes empty strings
 
+                 // Remove existing warning message if it exists
+                const existingWarning = document.getElementById('language-warning');
+                if (existingWarning) {
+                    existingWarning.remove();
+                }
+
                 if (words.length >= 5) {
                     message = words.slice(0, 5).join(' ');
                     const providerName = '<?php echo esc_js($providerName); ?>';
