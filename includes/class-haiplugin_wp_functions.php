@@ -318,16 +318,20 @@ function haiplugin_wp_lang_detection_script() {
             const submitButton = document.getElementById('wpforms-submit-<?php echo esc_js(str_replace('wpforms-form-', '', $contactForm)); ?>');
             const textareaElement = document.getElementById('<?php echo esc_js($messageField); ?>');
 
+            // Function to remove the warning message
+            function removeWarningMessage() {
+                const existingWarning = document.getElementById('language-warning');
+                if (existingWarning) {
+                    existingWarning.remove();
+                }
+            }
+
             // Detect language after typing 5 words
             textareaElement.addEventListener('input', function() {
                 let message = textareaElement.value;
                 const words = message.split(' ').filter(Boolean); // filter(Boolean) removes empty strings
 
-                 // Remove existing warning message if it exists
-                const existingWarning = document.getElementById('language-warning');
-                if (existingWarning) {
-                    existingWarning.remove();
-                }
+                removeWarningMessage(); // Remove warning message when textarea is revised
 
                 if (words.length >= 5) {
                     message = words.slice(0, 5).join(' ');
@@ -362,6 +366,7 @@ function haiplugin_wp_lang_detection_script() {
                                 submitButton.disabled = true;
                                 console.log('language Detection Active 3 Success');
                             } else {
+                                removeWarningMessage(); // Remove warning message when textarea is revised
                                 submitButton.disabled = false;
                             }
                         })
