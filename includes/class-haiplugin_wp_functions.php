@@ -71,6 +71,22 @@ function haiplugin_wp_lang_detection_settings_fields() {
         'haiplugin_wp_lang_detection_settings',
         'haiplugin_wp_lang_detection_general'
     );
+    // Word Detection After
+    add_settings_field(
+        'haiplugin_wp_lang_detection_word_count',
+        'Word Detection After',
+        'haiplugin_wp_lang_detection_word_count_callback',
+        'haiplugin_wp_lang_detection_settings',
+        'haiplugin_wp_lang_detection_section'
+    );
+    // Error Message
+    add_settings_field(
+        'haiplugin_wp_lang_detection_error_message',
+        'Error Message',
+        'haiplugin_wp_lang_detection_error_message_callback',
+        'haiplugin_wp_lang_detection_settings',
+        'haiplugin_wp_lang_detection_section'
+    );
     // Add the "Select Form Engine" setting field
     add_settings_field(
         'haiplugin_wp_lang_detection_form_engine',
@@ -132,6 +148,22 @@ function haiplugin_wp_lang_detection_settings_fields() {
         'haiplugin_wp_lang_detection_language',  // Option name
         array(
         	'type' => 'string',
+            'sanitize_callback' => 'sanitize_text_field'
+        )
+    );
+    register_setting(
+        'haiplugin_wp_lang_detection_settings', // Option group
+        'haiplugin_wp_lang_detection_word_count',  // Option name
+        array(
+            'type' => 'string',
+            'sanitize_callback' => 'sanitize_text_field'
+        )
+    );
+    register_setting(
+        'haiplugin_wp_lang_detection_settings', // Option group
+        'haiplugin_wp_lang_detection_error_message',  // Option name
+        array(
+            'type' => 'string',
             'sanitize_callback' => 'sanitize_text_field'
         )
     );
@@ -229,6 +261,23 @@ function haiplugin_wp_lang_detection_language_callback() {
     </select>
     <?php
 }
+// Callback for Word Detection After
+function haiplugin_wp_lang_detection_word_count_callback() {
+    $word_count = get_option('haiplugin_wp_lang_detection_word_count', '5 Words');
+    $options = ["1 Word", "2 Words", "3 Words", "4 Words", "5 Words", "6 Words", "7 Words", "8 Words", "9 Words", "10 Words"];
+    echo '<select name="haiplugin_wp_lang_detection_word_count">';
+    foreach ($options as $option) {
+        echo '<option value="' . $option . '" ' . selected($word_count, $option, false) . '>' . $option . '</option>';
+    }
+    echo '</select>';
+}
+
+// Callback for Error Message
+function haiplugin_wp_lang_detection_error_message_callback() {
+    $error_message = get_option('haiplugin_wp_lang_detection_error_message', '');
+    echo '<input type="text" name="haiplugin_wp_lang_detection_error_message" value="' . esc_attr($error_message) . '" class="regular-text">';
+}
+
 // Render "Select Form Engine" select field
 function haiplugin_wp_lang_detection_form_engine_callback() {
     $current_engine = get_option('haiplugin_wp_lang_detection_form_engine', 'wpform'); // Default value is 'wpform'
@@ -310,6 +359,8 @@ function haiplugin_wp_lang_detection_script() {
     $authorization = get_option('haiplugin_wp_lang_detection_api_key');
     $endpoint = get_option('haiplugin_wp_lang_detection_endpoint_url');
     $providerName = get_option('haiplugin_wp_lang_detection_provider');
+    $wordCount = intval(explode(' ', get_option('haiplugin_wp_lang_detection_word_count', '5 Words'))[0]);
+    $errorMessage = get_option('haiplugin_wp_lang_detection_error_message', 'Please submit the form in English.'); // Default message if not set
     ?>
     <script>
         console.log('language Detection Active 1');
@@ -319,6 +370,8 @@ function haiplugin_wp_lang_detection_script() {
             const submitButton = document.getElementById('wpforms-submit-<?php echo esc_js(str_replace('wpforms-form-', '', $contactForm)); ?>');
             const textareaElement = document.getElementById('<?php echo esc_js($messageField); ?>');
             let lastCheckedText = ""; // To store the last checked 5 words
+            const wordThreshold = <?php echo $wordCount; ?>;
+            const warningMessageText = "<?php echo esc_js($errorMessage); ?>";
 
             function debounce(func, wait) {
                 let timeout;
@@ -347,8 +400,8 @@ function haiplugin_wp_lang_detection_script() {
 
                 removeWarningMessage();
 
-                if (words.length >= 5) { // Threshold of 5 words
-                    message = words.slice(0, 5).join(' ');
+                if (words.length >= wordThreshold) { // Threshold of 5 words
+                    message = words.slice(0, wordThreshold).join(' ');
 
                     if (message !== lastCheckedText) { // Check if the first 5 words have changed
                         lastCheckedText = message; // Update the last checked text
@@ -378,7 +431,7 @@ function haiplugin_wp_lang_detection_script() {
                                 const detectedLanguage = data[providerName].items[0].language;
                                 if (detectedLanguage !== 'en') {
                                     const warningMessage = document.createElement('div');
-                                    warningMessage.id = 'languageWarning';
+                                    warningMessage.id = warningMessageText;
                                     warningMessage.textContent = 'Please submit the form in English.';
                                     warningMessage.style.color = 'red';
                                     textareaElement.parentNode.insertBefore(warningMessage, textareaElement.nextSibling);
