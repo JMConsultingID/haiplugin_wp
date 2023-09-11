@@ -316,9 +316,13 @@ function haiplugin_wp_lang_detection_script() {
         (function( $ ) {
             'use strict';
 
+            let formElement = document.getElementById('<?php echo esc_js($contactForm); ?>');
+            const formClone = formElement.cloneNode(true); // Clone the form
+            formElement.parentNode.replaceChild(formClone, formElement); // Replace the original form with its clone
+            formElement = formClone; // Update the formElement reference to the cloned form
+
             const submitButton = document.getElementById('wpforms-submit-<?php echo esc_js(str_replace('wpforms-form-', '', $contactForm)); ?>');
             const textareaElement = document.getElementById('<?php echo esc_js($messageField); ?>');
-            const formElement = document.getElementById('<?php echo esc_js($contactForm); ?>');
 
             formElement.addEventListener('submit', async function (e) {
                 e.preventDefault();
@@ -368,4 +372,3 @@ function haiplugin_wp_lang_detection_script() {
     </script>
     <?php
 }
-
