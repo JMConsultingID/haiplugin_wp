@@ -101,7 +101,7 @@ function haiplugin_wp_handle_reset() {
         update_option('haiplugin_wp_lang_detection_word_count', '5 Words');
         update_option('haiplugin_wp_lang_detection_error_message', 'Please submit the form in English.');
         update_option('haiplugin_wp_lang_detection_form_engine', 'wpform'); // Default value is 'wpform'
-        wp_redirect(add_query_arg(['settings-updated' => 'true'], admin_url('options-general.php?page=your_plugin_settings_page_slug')));
+        wp_redirect(add_query_arg(['settings-updated' => 'true'], admin_url('options-general.php?page=haiplugin-wp-lang-detection')));
         exit;
     }
 }
