@@ -77,7 +77,7 @@ function haiplugin_wp_lang_detection_settings_fields() {
         'Word Detection After',
         'haiplugin_wp_lang_detection_word_count_callback',
         'haiplugin_wp_lang_detection_settings',
-        'haiplugin_wp_lang_detection_section'
+        'haiplugin_wp_lang_detection_general'
     );
     // Error Message
     add_settings_field(
@@ -85,7 +85,7 @@ function haiplugin_wp_lang_detection_settings_fields() {
         'Error Message',
         'haiplugin_wp_lang_detection_error_message_callback',
         'haiplugin_wp_lang_detection_settings',
-        'haiplugin_wp_lang_detection_section'
+        'haiplugin_wp_lang_detection_general'
     );
     // Add the "Select Form Engine" setting field
     add_settings_field(
