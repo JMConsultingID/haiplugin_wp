@@ -333,9 +333,19 @@ function haiplugin_wp_lang_detection_script() {
                 };
             }
 
+            // Function to remove the warning message
+            function removeWarningMessage() {
+                const existingWarning = document.getElementById('languageWarning');
+                if (existingWarning) {
+                    existingWarning.remove();
+                }
+            }
+
             const detectLanguage = debounce(function() {
                 let message = textareaElement.value;
                 const words = message.split(' ').filter(Boolean); // filter(Boolean) removes empty strings
+
+                removeWarningMessage();
 
                 if (words.length >= 5) { // Threshold of 5 words
                     message = words.slice(0, 5).join(' ');
@@ -373,6 +383,7 @@ function haiplugin_wp_lang_detection_script() {
                                     submitButton.disabled = true;
                                     console.log('language Detection Active 3 Success');
                                 } else {
+                                    removeWarningMessage();
                                     submitButton.disabled = false;
                                 }
                             })
