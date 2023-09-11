@@ -316,58 +316,76 @@ function haiplugin_wp_lang_detection_script() {
         (function( $ ) {
             'use strict';
 
-            let formElement = document.getElementById('<?php echo esc_js($contactForm); ?>');
-            const formClone = formElement.cloneNode(true); // Clone the form
-            formElement.parentNode.replaceChild(formClone, formElement); // Replace the original form with its clone
-            formElement = formClone; // Update the formElement reference to the cloned form
-
             const submitButton = document.getElementById('wpforms-submit-<?php echo esc_js(str_replace('wpforms-form-', '', $contactForm)); ?>');
             const textareaElement = document.getElementById('<?php echo esc_js($messageField); ?>');
+            let lastCheckedText = ""; // To store the last checked 5 words
 
-            formElement.addEventListener('submit', async function (e) {
-                e.preventDefault();
-
-                let message = textareaElement.value;
-                message = message.split(' ').slice(0, 5).join(' ');
-                const providerName = '<?php echo esc_js($providerName); ?>';
-                console.log('language Detection Active 2');
-
-                const options = {
-                    method: 'POST',
-                    headers: {
-                        accept: 'application/json',
-                        'content-type': 'application/json',
-                        authorization: 'Bearer <?php echo esc_js($authorization); ?>'
-                    },
-                    body: JSON.stringify({
-                        text: message,
-                        response_as_dict: true,
-                        attributes_as_list: false,
-                        show_original_response: false,
-                        providers: providerName
-                    })
+            function debounce(func, wait) {
+                let timeout;
+                return function() {
+                    const context = this, args = arguments;
+                    const later = function() {
+                        timeout = null;
+                        func.apply(context, args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
                 };
+            }
 
-                try {
-                    const response = await fetch('<?php echo esc_url($endpoint); ?>', options);
-                    const data = await response.json();
-                    const detectedLanguage = data[providerName].items[0].language;
+            const detectLanguage = debounce(function() {
+                let message = textareaElement.value;
+                const words = message.split(' ').filter(Boolean); // filter(Boolean) removes empty strings
 
-                    if (detectedLanguage !== 'en') {
-                        const warningMessage = document.createElement('div');
-                        warningMessage.textContent = 'Please submit the form in English.';
-                        warningMessage.style.color = 'red';
-                        textareaElement.parentNode.insertBefore(warningMessage, textareaElement.nextSibling);
-                        submitButton.disabled = true;
-                        console.log('language Detection Active 3 Success');
-                    } else {
-                        formElement.submit();
+                if (words.length >= 5) { // Threshold of 5 words
+                    message = words.slice(0, 5).join(' ');
+
+                    if (message !== lastCheckedText) { // Check if the first 5 words have changed
+                        lastCheckedText = message; // Update the last checked text
+                        const providerName = '<?php echo esc_js($providerName); ?>';
+                        console.log('language Detection Active 2');
+
+                        const options = {
+                            method: 'POST',
+                            headers: {
+                                accept: 'application/json',
+                                'content-type': 'application/json',
+                                authorization: 'Bearer <?php echo esc_js($authorization); ?>'
+                            },
+                            body: JSON.stringify({
+                                text: message,
+                                response_as_dict: true,
+                                attributes_as_list: false,
+                                show_original_response: false,
+                                providers: providerName
+                            })
+                        };
+
+                        fetch('<?php echo esc_url($endpoint); ?>', options)
+                            .then(response => response.json())
+                            .then(data => {
+                                const detectedLanguage = data[providerName].items[0].language;
+                                if (detectedLanguage !== 'en') {
+                                    const warningMessage = document.createElement('div');
+                                    warningMessage.textContent = 'Please submit the form in English.';
+                                    warningMessage.style.color = 'red';
+                                    textareaElement.parentNode.insertBefore(warningMessage, textareaElement.nextSibling);
+                                    submitButton.disabled = true;
+                                    console.log('language Detection Active 3 Success');
+                                } else {
+                                    submitButton.disabled = false;
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                console.log('language Detection Active 4 Error');
+                            });
                     }
-                } catch (error) {
-                    console.error('Error:', error);
-                    console.log('language Detection Active 4 Error');
                 }
-            });
+            }, 500); // Debounce time of 500ms
+
+            textareaElement.addEventListener('input', detectLanguage);
+
         })( jQuery );
     </script>
     <?php
