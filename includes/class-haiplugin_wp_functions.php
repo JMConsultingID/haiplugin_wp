@@ -372,7 +372,7 @@ function haiplugin_wp_lang_detection_script() {
             let lastCheckedText = ""; // To store the last checked 5 words
             const wordThreshold = <?php echo $wordCount; ?>;
             const warningMessageText = "<?php echo esc_js($errorMessage); ?>";
-            const messageFieldID <?php echo esc_js($messageField); ?>
+            const messageFieldID = "<?php echo esc_js($messageField); ?>";
             const warningMessage = document.createElement('em');
             warningMessage.id = messageFieldID + '-languageWarning';
             warningMessage.className = 'wpforms-error-radius';
