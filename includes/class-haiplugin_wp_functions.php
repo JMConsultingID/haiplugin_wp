@@ -377,6 +377,7 @@ function haiplugin_wp_lang_detection_script() {
                                 const detectedLanguage = data[providerName].items[0].language;
                                 if (detectedLanguage !== 'en') {
                                     const warningMessage = document.createElement('div');
+                                    warningMessage.id = 'languageWarning';
                                     warningMessage.textContent = 'Please submit the form in English.';
                                     warningMessage.style.color = 'red';
                                     textareaElement.parentNode.insertBefore(warningMessage, textareaElement.nextSibling);
