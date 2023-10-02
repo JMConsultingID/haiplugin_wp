@@ -527,8 +527,6 @@ function haiplugin_wp_lang_detection_script() {
                 let message = textareaElement.value;
                 const words = this.value.split(/\s+/).filter(Boolean); // Split by whitespace and remove empty strings
 
-                removeWarningMessage();
-
                 if (words.length % wordThreshold === 0 && words.length !== 0) { // Threshold of 5 words
                     message = words.slice(0, wordThreshold).join(' ');
 
