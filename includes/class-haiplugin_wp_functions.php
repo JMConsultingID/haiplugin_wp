@@ -528,7 +528,7 @@ function haiplugin_wp_lang_detection_script() {
                 const words = this.value.split(/\s+/).filter(Boolean); // Split by whitespace and remove empty strings
 
                 if (words.length % wordThreshold === 0 && words.length !== 0) { // Threshold of 5 words
-                    message = words.slice(0, 10).join(' '); // Take only the first 10 words
+                    message = this.value; // Use the entire text for detection
 
                         const providerName = '<?php echo esc_js($providerName); ?>';
                         console.log('language Detection Preparing Data');
