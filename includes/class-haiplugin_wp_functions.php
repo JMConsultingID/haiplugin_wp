@@ -560,9 +560,11 @@ function haiplugin_wp_lang_detection_script() {
                                     textareaElement.parentNode.insertBefore(warningMessage, textareaElement.nextSibling);
                                     warningMessage.textContent = warningMessageText;
                                     submitButton.disabled = true;
+                                    console.log('message : '+message);
                                     console.log('language Detection is not English : '+detectedLanguage + ' | confidence : '+detectedConfidence);
                                 } else {
                                     removeWarningMessage();
+                                    console.log('message : '+message);
                                     submitButton.disabled = false;
                                 }
                             })
