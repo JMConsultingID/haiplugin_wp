@@ -446,35 +446,34 @@ add_action('wp_enqueue_scripts', 'haiplugin_wp_enqueue_scripts');
 function haiplugin_wp_lang_detection_script() {
 
 }
-function wpf_dev_process_filter( $fields, $entry, $form_data ) {
+
+function wpf_dev_process( $fields, $entry, $form_data ) {
     ?>
     <script type="text/javascript">
         console.log('form validation');
     </script>
     <?php
-    error_log('haiplugin_wpforms_custom_validation function was run.');
-    $form_id = 461; // Change form ID
-     
-    // Bail early if form ID does not match
-    if ( $form_data[ 'id' ] != $form_id ) {
+      
+    // Optional, you can limit to specific forms. Below, we restrict output to
+    // form #5.
+    if ( absint( $form_data[ 'id' ] ) !== 461 ) {
         return $fields;
     }
-     
-    foreach ( $fields as $field ) {
-         
-        // If field type is rating and it is empty, assign a value of 0
-        if ( $field[ 'type' ] == 'rating' && empty( $field[ 'value' ] ) ) {
-             
-            $fields[$field[ 'id' ]][ 'value' ] = 0;
-             
-        }
-         
-    }
-     
-    return $fields;
       
-}
-add_filter( 'wpforms_process_filter', 'wpf_dev_process_filter', 10, 3 );
+    // check the field ID 4 to see if it's empty and if it is, run the error    
+    if(empty( $fields[4][ 'value' ]) ) 
+        {
+            // Add to global errors. This will stop form entry from being saved to the database.
+            // Uncomment the line below if you need to display the error above the form.
+            // wpforms()->process->errors[ $form_data[ 'id' ] ][ 'header' ] = esc_html__( 'Some error occurred.', 'plugin-domain' );    
+  
+            // Check the field ID 4 and show error message at the top of form and under the specific field
+               wpforms()->process->errors[ $form_data[ 'id' ] ] [ '4' ] = esc_html__( 'Some error occurred.', 'plugin-domain' );
+  
+            // Add additional logic (what to do if error is not displayed)
+        }
+    }
+add_action( 'wpforms_process', 'wpf_dev_process', 10, 3 );
 
 function haiplugin_wp_log($message, $type = 'info') {
     $log_file = WP_CONTENT_DIR . '/haiplugin_wp_log.log'; // Lokasi file log di direktori wp-content
