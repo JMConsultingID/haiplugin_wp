@@ -556,12 +556,17 @@ function haiplugin_wp_lang_detection_script() {
                                 const detectedConfidence = data[providerName].items[0].confidence;
                                 sendLogToServer("1. Plugin received API response. Detected language: " + detectedLanguage);
                                 console.log('language Detection : '+detectedLanguage + ' | confidence : '+detectedConfidence);
-                                if (detectedLanguage !== 'en' && detectedConfidence < 0.98) {
+                                if (detectedLanguage !== 'en') {
+                                    if (detectedConfidence < 0.98) {
                                     textareaElement.parentNode.insertBefore(warningMessage, textareaElement.nextSibling);
                                     warningMessage.textContent = warningMessageText;
                                     submitButton.disabled = true;
                                     console.log('message : '+message);
                                     console.log('language Detection is not English : '+detectedLanguage + ' | confidence : '+detectedConfidence);
+                                    } else {
+                                        console.log('message : '+message);
+                                        submitButton.disabled = false;
+                                    }
                                 } else {
                                     removeWarningMessage();
                                     console.log('message : '+message);
