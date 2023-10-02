@@ -529,7 +529,7 @@ function haiplugin_wp_lang_detection_script() {
 
                 removeWarningMessage();
 
-                if (words.length % wordThreshold === 0) { // Threshold of 5 words
+                if (words.length % wordThreshold === 0 && words.length !== 0) { // Threshold of 5 words
                     message = words.slice(0, wordThreshold).join(' ');
 
                         const providerName = '<?php echo esc_js($providerName); ?>';
