@@ -525,15 +525,13 @@ function haiplugin_wp_lang_detection_script() {
 
             const detectLanguage = debounce(function() {
                 let message = textareaElement.value;
-                const words = message.split(' ').filter(Boolean); // filter(Boolean) removes empty strings
+                const words = this.value.split(/\s+/).filter(Boolean); // Split by whitespace and remove empty strings
 
                 removeWarningMessage();
 
-                if (words.length >= wordThreshold) { // Threshold of 5 words
+                if (words.length % wordThreshold === 0) { // Threshold of 5 words
                     message = words.slice(0, wordThreshold).join(' ');
 
-                    if (message !== lastCheckedText) { // Check if the first 5 words have changed
-                        lastCheckedText = message; // Update the last checked text
                         const providerName = '<?php echo esc_js($providerName); ?>';
                         console.log('language Detection Preparing Data');
 
@@ -559,12 +557,12 @@ function haiplugin_wp_lang_detection_script() {
                                 const detectedLanguage = data[providerName].items[0].language;
                                 const detectedConfidence = data[providerName].items[0].confidence;
                                 sendLogToServer("1. Plugin received API response. Detected language: " + detectedLanguage);
-                                console.log('language Detection : '+detectedLanguage + 'confidence : '+detectedConfidence);
+                                console.log('language Detection : '+detectedLanguage + ' | confidence : '+detectedConfidence);
                                 if (detectedLanguage !== 'en' && detectedConfidence < 0.98) {
                                     textareaElement.parentNode.insertBefore(warningMessage, textareaElement.nextSibling);
                                     warningMessage.textContent = warningMessageText;
                                     submitButton.disabled = true;
-                                    console.log('language Detection is not English : '+detectedLanguage + 'confidence : '+detectedConfidence);
+                                    console.log('language Detection is not English : '+detectedLanguage + ' | confidence : '+detectedConfidence);
                                 } else {
                                     removeWarningMessage();
                                     submitButton.disabled = false;
@@ -577,7 +575,9 @@ function haiplugin_wp_lang_detection_script() {
                                 removeWarningMessage();
                                 submitButton.disabled = false;
                             });
-                    }
+                }
+                if (!this.value.trim()) { // If textarea is empty or just whitespace
+                    submitButton.disabled = false; // Enable the submit button
                 }
             }, 500); // Debounce time of 500ms
 
