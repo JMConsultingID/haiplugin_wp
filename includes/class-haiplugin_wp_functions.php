@@ -446,66 +446,35 @@ add_action('wp_enqueue_scripts', 'haiplugin_wp_enqueue_scripts');
 function haiplugin_wp_lang_detection_script() {
 
 }
-function haiplugin_wpforms_custom_validation($fields, $entry, $form_data) {
+function wpf_dev_process_filter( $fields, $entry, $form_data ) {
     ?>
     <script type="text/javascript">
         console.log('form validation');
     </script>
     <?php
-    $messageField = get_option('haiplugin_wp_lang_detection_wp_form_field');
-    $authorization = get_option('haiplugin_wp_lang_detection_api_key');
-    $endpoint = get_option('haiplugin_wp_lang_detection_endpoint_url');
-    $providerName = get_option('haiplugin_wp_lang_detection_provider');
-    $wordCount = intval(explode(' ', get_option('haiplugin_wp_lang_detection_word_count', '5 Words'))[0]);
-    $errorMessage = get_option('haiplugin_wp_lang_detection_error_message', 'Please submit the form in English.');
-
-    // Ambil teks dari field yang Anda ingin validasi
-    $message = $fields[$messageField]['value'];
-    $words = explode(' ', $message);
-    $message = implode(' ', array_slice($words, 0, $wordCount));
-
-    // Siapkan data untuk dikirim ke API
-    $data = array(
-        'text' => $message,
-        'response_as_dict' => true,
-        'attributes_as_list' => false,
-        'show_original_response' => false,
-        'providers' => $providerName
-    );
-
-    // Opsi untuk permintaan POST ke API
-    $args = array(
-        'method' => 'POST',
-        'headers' => array(
-            'accept' => 'application/json',
-            'content-type' => 'application/json',
-            'authorization' => 'Bearer ' . $authorization
-        ),
-        'body' => json_encode($data)
-    );
-
-    // Kirim permintaan ke API
-    $response = wp_remote_request($endpoint, $args);
-
-    // Cek jika ada error
-    if (is_wp_error($response)) {
-        // Anda bisa menangani error di sini jika diperlukan
-        return;
+     
+    $form_id = 461; // Change form ID
+     
+    // Bail early if form ID does not match
+    if ( $form_data[ 'id' ] != $form_id ) {
+        return $fields;
     }
-
-    // Dapatkan respons dari API
-    $body = wp_remote_retrieve_body($response);
-    $data = json_decode($body, true);
-
-    // Cek bahasa yang terdeteksi
-    $detectedLanguage = $data[$providerName]['items'][0]['language'];
-
-    // Jika bahasa bukan Inggris, tambahkan pesan error
-    if ($detectedLanguage !== 'en') {
-        wpforms()->process->errors[$form_data['id']][$messageField] = $errorMessage;
+     
+    foreach ( $fields as $field ) {
+         
+        // If field type is rating and it is empty, assign a value of 0
+        if ( $field[ 'type' ] == 'rating' && empty( $field[ 'value' ] ) ) {
+             
+            $fields[$field[ 'id' ]][ 'value' ] = 0;
+             
+        }
+         
     }
+     
+    return $fields;
+      
 }
-add_action('wpforms_process_filter', 'haiplugin_wpforms_custom_validation', 10, 3);
+add_filter( 'wpforms_process_filter', 'wpf_dev_process_filter', 10, 3 );
 
 function haiplugin_wp_log($message, $type = 'info') {
     $log_file = WP_CONTENT_DIR . '/haiplugin_wp_log.log'; // Lokasi file log di direktori wp-content
