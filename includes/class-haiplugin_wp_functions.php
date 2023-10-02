@@ -556,9 +556,10 @@ function haiplugin_wp_lang_detection_script() {
                             .then(response => response.json())
                             .then(data => {                                
                                 const detectedLanguage = data[providerName].items[0].language;
+                                const detectedConfidence = data[providerName].items[0].language;
                                 sendLogToServer("1. Plugin received API response. Detected language: " + detectedLanguage);
                                 console.log('language Detection : '+detectedLanguage);
-                                if (detectedLanguage !== 'en') {
+                                if (detectedLanguage !== 'en' && detectedConfidence <= 0.98) {
                                     textareaElement.parentNode.insertBefore(warningMessage, textareaElement.nextSibling);
                                     warningMessage.textContent = warningMessageText;
                                     submitButton.disabled = true;
