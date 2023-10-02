@@ -523,6 +523,14 @@ function haiplugin_wp_lang_detection_script() {
                 }
             });
 
+            textareaElement.addEventListener('blur', function() {
+                if (!this.value.trim()) {
+                    submitButton.disabled = false;
+                    removeWarningMessage();
+                }
+            });
+
+
             const detectLanguage = debounce(function() {
                 let message = textareaElement.value;
                 const words = this.value.split(/\s+/).filter(Boolean); // Split by whitespace and remove empty strings
