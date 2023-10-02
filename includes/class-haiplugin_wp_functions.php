@@ -556,7 +556,7 @@ function haiplugin_wp_lang_detection_script() {
                                 const detectedConfidence = data[providerName].items[0].confidence;
                                 sendLogToServer("1. Plugin received API response. Detected language: " + detectedLanguage);
                                 console.log('language Detection : '+detectedLanguage + ' | confidence : '+detectedConfidence);
-                                if ((detectedLanguage === 'en' && detectedConfidence < 0.98) || (detectedLanguage !== 'en')) {
+                                if ((detectedLanguage === 'en' && detectedConfidence >= 0.98) || (detectedLanguage !== 'en')) {
                                     removeWarningMessage();
                                     console.log('message s : '+message);
                                     submitButton.disabled = false;
