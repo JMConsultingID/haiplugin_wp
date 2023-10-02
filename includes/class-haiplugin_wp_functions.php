@@ -440,7 +440,7 @@ function haiplugin_wp_enqueue_scripts() {
         ?>
         <script>
         var form_ids = '<?php echo $form_id; ?>';
-        console.log('form_id : '+form_id);
+        console.log('form_id : '+form_ids);
         </script>
         <?php     
         if ($plugin_enabled === 'enable') {
@@ -451,7 +451,7 @@ function haiplugin_wp_enqueue_scripts() {
         ?>
         <script>
         var form_ids = '<?php echo $form_id; ?>';
-        console.log('form_id : '+form_id);
+        console.log('form_id : '+form_ids);
         </script>
         <?php
     }
