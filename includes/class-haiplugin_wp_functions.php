@@ -436,12 +436,10 @@ function is_wpform_present($form_id) {
 function haiplugin_wp_enqueue_scripts() {
     $form_id = str_replace('wpforms-form-', '', get_option('haiplugin_wp_lang_detection_wp_form'));
     $plugin_enabled = get_option('haiplugin_wp_lang_detection_enabled');
-    if (is_wpform_present($form_id)) {        
         if ($plugin_enabled === 'enable') {
             // Enqueue your scripts or inline scripts here
-            add_action('wp_footer', 'haiplugin_wp_lang_detection_script', 20);
+            add_action('wp_footer', 'haiplugin_wp_lang_detection_script', 90);
         }
-    }
 }
 add_action('wp_enqueue_scripts', 'haiplugin_wp_enqueue_scripts');
 
