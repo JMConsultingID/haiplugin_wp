@@ -564,7 +564,7 @@ function haiplugin_wp_lang_detection_script() {
                                     console.log('message : '+message);
                                     console.log('language Detection is not English : '+detectedLanguage + ' | confidence : '+detectedConfidence);
                                     } else {
-                                        console.log('message : '+message);
+                                        console.log('message Confidence  : '+message);
                                         submitButton.disabled = false;
                                     }
                                 } else {
