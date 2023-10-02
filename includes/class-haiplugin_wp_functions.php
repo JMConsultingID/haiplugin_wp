@@ -436,82 +436,157 @@ function is_wpform_present($form_id) {
 function haiplugin_wp_enqueue_scripts() {
     $form_id = str_replace('wpforms-form-', '', get_option('haiplugin_wp_lang_detection_wp_form'));
     $plugin_enabled = get_option('haiplugin_wp_lang_detection_enabled');
+    if (is_wpform_present($form_id)) {        
         if ($plugin_enabled === 'enable') {
             // Enqueue your scripts or inline scripts here
             add_action('wp_footer', 'haiplugin_wp_lang_detection_script', 90);
         }
+    }
 }
 add_action('wp_enqueue_scripts', 'haiplugin_wp_enqueue_scripts');
 
 function haiplugin_wp_lang_detection_script() {
-
-}
-
-function wpf_dev_process( $fields, $entry, $form_data ) {
+    $contactForm = get_option('haiplugin_wp_lang_detection_wp_form');
+    $messageField = get_option('haiplugin_wp_lang_detection_wp_form_field');
+    $authorization = get_option('haiplugin_wp_lang_detection_api_key');
+    $endpoint = get_option('haiplugin_wp_lang_detection_endpoint_url');
+    $providerName = get_option('haiplugin_wp_lang_detection_provider');
+    $wordCount = intval(explode(' ', get_option('haiplugin_wp_lang_detection_word_count', '5 Words'))[0]);
+    $errorMessage = get_option('haiplugin_wp_lang_detection_error_message', 'Please submit the form in English.'); // Default message if not set
     ?>
-    <script type="text/javascript">
-        console.log('form validation');
+    <script>
+        console.log('language Detection Active 1');
+        (function( $ ) {
+            'use strict';
+
+            const submitButton = document.getElementById('wpforms-submit-<?php echo esc_js(str_replace('wpforms-form-', '', $contactForm)); ?>');
+            const textareaElement = document.getElementById('<?php echo esc_js($messageField); ?>');
+            let lastCheckedText = ""; // To store the last checked 5 words
+            const wordThreshold = <?php echo $wordCount; ?>;
+            const warningMessageText = "<?php echo esc_js($errorMessage); ?>";
+            const messageFieldID = "<?php echo esc_js($messageField); ?>";
+            const warningMessage = document.createElement('em');
+            warningMessage.id = messageFieldID + '-languageWarning';
+            warningMessage.className = 'wpforms-error-radius';
+            warningMessage.setAttribute('role', 'alert');
+            warningMessage.setAttribute('aria-label', 'Error message');
+            warningMessage.style.color = 'red';
+
+            function sendLogToServer(message, type = 'info') {
+                jQuery.ajax({
+                    url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                    type: 'POST',
+                    data: {
+                        action: 'haiplugin_wp_log_action',
+                        message: message,
+                        type: type
+                    },
+                    success: function(response) {
+                        if (response.data && response.data.message) {
+                            console.log(response.data.message);
+                        } else {
+                            console.warn('Unexpected server response:', response);
+                        }
+                    },
+                    error: function() {
+                        console.error('Failed to send log to server.');
+                    }
+                });
+            }
+
+
+            function debounce(func, wait) {
+                let timeout;
+                return function() {
+                    const context = this, args = arguments;
+                    const later = function() {
+                        timeout = null;
+                        func.apply(context, args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            }
+
+            // Function to remove the warning message
+            function removeWarningMessage() {
+                const existingWarning = document.getElementById(messageFieldID + '-languageWarning');
+                if (existingWarning) {
+                    existingWarning.remove();
+                }
+            }
+
+            textareaElement.addEventListener('input', function() {
+                if (!this.value.trim()) {
+                    submitButton.disabled = false;
+                    removeWarningMessage();
+                }
+            });
+
+            const detectLanguage = debounce(function() {
+                let message = textareaElement.value;
+                const words = this.value.split(/\s+/).filter(Boolean); // Split by whitespace and remove empty strings
+
+                if (words.length % wordThreshold === 0 && words.length !== 0) { // Threshold of 5 words
+                    message = words.slice(0, 10).join(' '); // Use the entire text for detection
+
+                        const providerName = '<?php echo esc_js($providerName); ?>';
+                        console.log('language Detection Preparing Data');
+
+                        const options = {
+                            method: 'POST',
+                            headers: {
+                                accept: 'application/json',
+                                'content-type': 'application/json',
+                                authorization: 'Bearer <?php echo esc_js($authorization); ?>'
+                            },
+                            body: JSON.stringify({
+                                text: message,
+                                response_as_dict: true,
+                                attributes_as_list: false,
+                                show_original_response: false,
+                                providers: providerName
+                            })
+                        };
+
+                        fetch('<?php echo esc_url($endpoint); ?>', options)
+                            .then(response => response.json())
+                            .then(data => {                                
+                                const detectedLanguage = data[providerName].items[0].language;
+                                const detectedConfidence = data[providerName].items[0].confidence;
+                                sendLogToServer("1. Plugin received API response. Detected language: " + detectedLanguage);
+                                console.log('language Detection : '+detectedLanguage + ' | confidence : '+detectedConfidence);
+                                if (detectedLanguage === 'en' && detectedConfidence >= 0.98) {
+                                    removeWarningMessage();
+                                    console.log('message s : '+message);
+                                    submitButton.disabled = false;
+                                } else {
+                                    textareaElement.parentNode.insertBefore(warningMessage, textareaElement.nextSibling);
+                                    warningMessage.textContent = warningMessageText;
+                                    submitButton.disabled = true;
+                                    console.log('message : '+message);
+                                    console.log('language Detection is not English : '+detectedLanguage + ' | confidence : '+detectedConfidence);
+                                } 
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                console.log('language Detection Active 4 Error : '+error);
+                                sendLogToServer("3. Plugin encountered an error: " + error, "error");
+                                removeWarningMessage();
+                                submitButton.disabled = false;
+                            });
+                }
+                if (!this.value.trim()) { // If textarea is empty or just whitespace
+                    submitButton.disabled = false; // Enable the submit button
+                }
+            }, 500); // Debounce time of 500ms
+
+            textareaElement.addEventListener('input', detectLanguage);
+
+        })( jQuery );
     </script>
     <?php
-    error_log('haiplugin_wpforms_custom_validation function was run proceess.');
-    // Optional, you can limit to specific forms. Below, we restrict output to
-    // form #5.
-    if ( absint( $form_data[ 'id' ] ) !== 461 ) {
-        return $fields;
-    }
-      
-    // check the field ID 4 to see if it's empty and if it is, run the error    
-    if(empty( $fields[4][ 'value' ]) ) 
-        {
-            // Add to global errors. This will stop form entry from being saved to the database.
-            // Uncomment the line below if you need to display the error above the form.
-            // wpforms()->process->errors[ $form_data[ 'id' ] ][ 'header' ] = esc_html__( 'Some error occurred.', 'plugin-domain' );    
-  
-            // Check the field ID 4 and show error message at the top of form and under the specific field
-               wpforms()->process->errors[ $form_data[ 'id' ] ] [ '4' ] = esc_html__( 'Some error occurred.', 'plugin-domain' );
-  
-            // Add additional logic (what to do if error is not displayed)
-        }
-    }
-add_action( 'wpforms_process', 'wpf_dev_process', 10, 3 );
-
-function wpf_dev_process_complete( $fields, $entry, $form_data, $entry_id ) {
-    ?>
-    <script type="text/javascript">
-        console.log('form validation');
-    </script>
-    <?php
-
-    error_log('haiplugin_wpforms_custom_validation function was run.');
-    $form_id = 461; // Change form ID
-      
-    // Optional, you can limit to specific forms. Below, we restrict output to
-    // form #5.
-    if ( absint( $form_data[ 'id' ] ) !== 461 ) {
-        return;
-    }
-     
-    // Get the full entry object
-    $entry = wpforms()->entry->get( $entry_id );
- 
-    // Fields are in JSON, so we decode to an array
-    $entry_fields = json_decode( $entry->fields, true );
- 
-    // Check to see if user selected 'yes' for callback
-    if($entry_fields[6][ 'value' ] === 'Yes') {
-        // Set the hidden field to 'Needs Callback' to filter through entries
-        $entry_fields[7][ 'value' ] = 'Needs Callback';
-    }
- 
-    // Convert back to json
-    $entry_fields = json_encode( $entry_fields );
- 
-    // Save changes
-    wpforms()->entry->update( $entry_id, array( 'fields' => $entry_fields ), '', '', array( 'cap' => false ) );
- 
 }
-add_action( 'wpforms_process_complete', 'wpf_dev_process_complete', 10, 4 );
-
 function haiplugin_wp_log($message, $type = 'info') {
     $log_file = WP_CONTENT_DIR . '/haiplugin_wp_log.log'; // Lokasi file log di direktori wp-content
 
