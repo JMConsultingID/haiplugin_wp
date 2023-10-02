@@ -447,7 +447,11 @@ function haiplugin_wp_lang_detection_script() {
 
 }
 function haiplugin_wpforms_custom_validation($fields, $entry, $form_data) {
-    // Ambil opsi dari database
+    ?>
+    <script type="text/javascript">
+        console.log('form validation');
+    </script>
+    <?php
     $messageField = get_option('haiplugin_wp_lang_detection_wp_form_field');
     $authorization = get_option('haiplugin_wp_lang_detection_api_key');
     $endpoint = get_option('haiplugin_wp_lang_detection_endpoint_url');
