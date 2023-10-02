@@ -444,147 +444,65 @@ function haiplugin_wp_enqueue_scripts() {
 add_action('wp_enqueue_scripts', 'haiplugin_wp_enqueue_scripts');
 
 function haiplugin_wp_lang_detection_script() {
-    $contactForm = get_option('haiplugin_wp_lang_detection_wp_form');
+
+}
+function haiplugin_wpforms_custom_validation($fields, $entry, $form_data) {
+    // Ambil opsi dari database
     $messageField = get_option('haiplugin_wp_lang_detection_wp_form_field');
     $authorization = get_option('haiplugin_wp_lang_detection_api_key');
     $endpoint = get_option('haiplugin_wp_lang_detection_endpoint_url');
     $providerName = get_option('haiplugin_wp_lang_detection_provider');
     $wordCount = intval(explode(' ', get_option('haiplugin_wp_lang_detection_word_count', '5 Words'))[0]);
-    $errorMessage = get_option('haiplugin_wp_lang_detection_error_message', 'Please submit the form in English.'); // Default message if not set
-    ?>
-    <script>
-        console.log('language Detection Active 1');
-        (function( $ ) {
-            'use strict';
+    $errorMessage = get_option('haiplugin_wp_lang_detection_error_message', 'Please submit the form in English.');
 
-            const submitButton = document.getElementById('wpforms-submit-<?php echo esc_js(str_replace('wpforms-form-', '', $contactForm)); ?>');
-            const textareaElement = document.getElementById('<?php echo esc_js($messageField); ?>');
-            let lastCheckedText = ""; // To store the last checked 5 words
-            const wordThreshold = <?php echo $wordCount; ?>;
-            const warningMessageText = "<?php echo esc_js($errorMessage); ?>";
-            const messageFieldID = "<?php echo esc_js($messageField); ?>";
-            const warningMessage = document.createElement('em');
-            warningMessage.id = messageFieldID + '-languageWarning';
-            warningMessage.className = 'wpforms-error-radius';
-            warningMessage.setAttribute('role', 'alert');
-            warningMessage.setAttribute('aria-label', 'Error message');
-            warningMessage.style.color = 'red';
+    // Ambil teks dari field yang Anda ingin validasi
+    $message = $fields[$messageField]['value'];
+    $words = explode(' ', $message);
+    $message = implode(' ', array_slice($words, 0, $wordCount));
 
-            function sendLogToServer(message, type = 'info') {
-                jQuery.ajax({
-                    url: '<?php echo admin_url('admin-ajax.php'); ?>',
-                    type: 'POST',
-                    data: {
-                        action: 'haiplugin_wp_log_action',
-                        message: message,
-                        type: type
-                    },
-                    success: function(response) {
-                        if (response.data && response.data.message) {
-                            console.log(response.data.message);
-                        } else {
-                            console.warn('Unexpected server response:', response);
-                        }
-                    },
-                    error: function() {
-                        console.error('Failed to send log to server.');
-                    }
-                });
-            }
+    // Siapkan data untuk dikirim ke API
+    $data = array(
+        'text' => $message,
+        'response_as_dict' => true,
+        'attributes_as_list' => false,
+        'show_original_response' => false,
+        'providers' => $providerName
+    );
 
+    // Opsi untuk permintaan POST ke API
+    $args = array(
+        'method' => 'POST',
+        'headers' => array(
+            'accept' => 'application/json',
+            'content-type' => 'application/json',
+            'authorization' => 'Bearer ' . $authorization
+        ),
+        'body' => json_encode($data)
+    );
 
-            function debounce(func, wait) {
-                let timeout;
-                return function() {
-                    const context = this, args = arguments;
-                    const later = function() {
-                        timeout = null;
-                        func.apply(context, args);
-                    };
-                    clearTimeout(timeout);
-                    timeout = setTimeout(later, wait);
-                };
-            }
+    // Kirim permintaan ke API
+    $response = wp_remote_request($endpoint, $args);
 
-            // Function to remove the warning message
-            function removeWarningMessage() {
-                const existingWarning = document.getElementById(messageFieldID + '-languageWarning');
-                if (existingWarning) {
-                    existingWarning.remove();
-                }
-            }
+    // Cek jika ada error
+    if (is_wp_error($response)) {
+        // Anda bisa menangani error di sini jika diperlukan
+        return;
+    }
 
-            textareaElement.addEventListener('input', function() {
-                if (!this.value.trim()) {
-                    submitButton.disabled = false;
-                    removeWarningMessage();
-                }
-            });
+    // Dapatkan respons dari API
+    $body = wp_remote_retrieve_body($response);
+    $data = json_decode($body, true);
 
-            const detectLanguage = debounce(function() {
-                let message = textareaElement.value;
-                const words = this.value.split(/\s+/).filter(Boolean); // Split by whitespace and remove empty strings
+    // Cek bahasa yang terdeteksi
+    $detectedLanguage = $data[$providerName]['items'][0]['language'];
 
-                if (words.length % wordThreshold === 0 && words.length !== 0) { // Threshold of 5 words
-                    message = words.slice(0, 10).join(' '); // Use the entire text for detection
-
-                        const providerName = '<?php echo esc_js($providerName); ?>';
-                        console.log('language Detection Preparing Data');
-
-                        const options = {
-                            method: 'POST',
-                            headers: {
-                                accept: 'application/json',
-                                'content-type': 'application/json',
-                                authorization: 'Bearer <?php echo esc_js($authorization); ?>'
-                            },
-                            body: JSON.stringify({
-                                text: message,
-                                response_as_dict: true,
-                                attributes_as_list: false,
-                                show_original_response: false,
-                                providers: providerName
-                            })
-                        };
-
-                        fetch('<?php echo esc_url($endpoint); ?>', options)
-                            .then(response => response.json())
-                            .then(data => {                                
-                                const detectedLanguage = data[providerName].items[0].language;
-                                const detectedConfidence = data[providerName].items[0].confidence;
-                                sendLogToServer("1. Plugin received API response. Detected language: " + detectedLanguage);
-                                console.log('language Detection : '+detectedLanguage + ' | confidence : '+detectedConfidence);
-                                if (detectedLanguage === 'en' && detectedConfidence >= 0.98) {
-                                    removeWarningMessage();
-                                    console.log('message s : '+message);
-                                    submitButton.disabled = false;
-                                } else {
-                                    textareaElement.parentNode.insertBefore(warningMessage, textareaElement.nextSibling);
-                                    warningMessage.textContent = warningMessageText;
-                                    submitButton.disabled = true;
-                                    console.log('message : '+message);
-                                    console.log('language Detection is not English : '+detectedLanguage + ' | confidence : '+detectedConfidence);
-                                } 
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                                console.log('language Detection Active 4 Error : '+error);
-                                sendLogToServer("3. Plugin encountered an error: " + error, "error");
-                                removeWarningMessage();
-                                submitButton.disabled = false;
-                            });
-                }
-                if (!this.value.trim()) { // If textarea is empty or just whitespace
-                    submitButton.disabled = false; // Enable the submit button
-                }
-            }, 500); // Debounce time of 500ms
-
-            textareaElement.addEventListener('input', detectLanguage);
-
-        })( jQuery );
-    </script>
-    <?php
+    // Jika bahasa bukan Inggris, tambahkan pesan error
+    if ($detectedLanguage !== 'en') {
+        wpforms()->process->errors[$form_data['id']][$messageField] = $errorMessage;
+    }
 }
+add_action('wpforms_process_filter', 'haiplugin_wpforms_custom_validation', 10, 3);
+
 function haiplugin_wp_log($message, $type = 'info') {
     $log_file = WP_CONTENT_DIR . '/haiplugin_wp_log.log'; // Lokasi file log di direktori wp-content
 
