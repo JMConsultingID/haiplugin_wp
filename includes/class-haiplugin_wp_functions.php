@@ -453,7 +453,7 @@ function wpf_dev_process( $fields, $entry, $form_data ) {
         console.log('form validation');
     </script>
     <?php
-      
+    error_log('haiplugin_wpforms_custom_validation function was run proceess.');
     // Optional, you can limit to specific forms. Below, we restrict output to
     // form #5.
     if ( absint( $form_data[ 'id' ] ) !== 461 ) {
@@ -474,6 +474,43 @@ function wpf_dev_process( $fields, $entry, $form_data ) {
         }
     }
 add_action( 'wpforms_process', 'wpf_dev_process', 10, 3 );
+
+function wpf_dev_process_complete( $fields, $entry, $form_data, $entry_id ) {
+    ?>
+    <script type="text/javascript">
+        console.log('form validation');
+    </script>
+    <?php
+
+    error_log('haiplugin_wpforms_custom_validation function was run.');
+    $form_id = 461; // Change form ID
+      
+    // Optional, you can limit to specific forms. Below, we restrict output to
+    // form #5.
+    if ( absint( $form_data[ 'id' ] ) !== 461 ) {
+        return;
+    }
+     
+    // Get the full entry object
+    $entry = wpforms()->entry->get( $entry_id );
+ 
+    // Fields are in JSON, so we decode to an array
+    $entry_fields = json_decode( $entry->fields, true );
+ 
+    // Check to see if user selected 'yes' for callback
+    if($entry_fields[6][ 'value' ] === 'Yes') {
+        // Set the hidden field to 'Needs Callback' to filter through entries
+        $entry_fields[7][ 'value' ] = 'Needs Callback';
+    }
+ 
+    // Convert back to json
+    $entry_fields = json_encode( $entry_fields );
+ 
+    // Save changes
+    wpforms()->entry->update( $entry_id, array( 'fields' => $entry_fields ), '', '', array( 'cap' => false ) );
+ 
+}
+add_action( 'wpforms_process_complete', 'wpf_dev_process_complete', 10, 4 );
 
 function haiplugin_wp_log($message, $type = 'info') {
     $log_file = WP_CONTENT_DIR . '/haiplugin_wp_log.log'; // Lokasi file log di direktori wp-content
