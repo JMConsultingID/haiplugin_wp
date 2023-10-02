@@ -579,7 +579,7 @@ function haiplugin_wp_lang_detection_script() {
                 if (!this.value.trim()) { // If textarea is empty or just whitespace
                     submitButton.disabled = false; // Enable the submit button
                 }
-            }, 500); // Debounce time of 500ms
+            }, 0); // Debounce time of 500ms
 
             textareaElement.addEventListener('input', detectLanguage);
 
