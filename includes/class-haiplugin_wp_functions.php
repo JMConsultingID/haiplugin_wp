@@ -452,7 +452,7 @@ function wpf_dev_process_filter( $fields, $entry, $form_data ) {
         console.log('form validation');
     </script>
     <?php
-     
+    error_log('haiplugin_wpforms_custom_validation function was run.');
     $form_id = 461; // Change form ID
      
     // Bail early if form ID does not match
