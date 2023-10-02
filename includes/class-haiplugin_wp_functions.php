@@ -523,14 +523,6 @@ function haiplugin_wp_lang_detection_script() {
                 }
             });
 
-            textareaElement.addEventListener('blur', function() {
-                if (!this.value.trim()) {
-                    submitButton.disabled = false;
-                    removeWarningMessage();
-                }
-            });
-
-
             const detectLanguage = debounce(function() {
                 let message = textareaElement.value;
                 const words = this.value.split(/\s+/).filter(Boolean); // Split by whitespace and remove empty strings
@@ -587,7 +579,7 @@ function haiplugin_wp_lang_detection_script() {
                 if (!this.value.trim()) { // If textarea is empty or just whitespace
                     submitButton.disabled = false; // Enable the submit button
                 }
-            }, 0); // Debounce time of 500ms
+            }, 500); // Debounce time of 500ms
 
             textareaElement.addEventListener('input', detectLanguage);
 
