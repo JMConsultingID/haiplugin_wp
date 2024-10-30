@@ -428,7 +428,7 @@ function haiplugin_wp_lang_detection_wp_form_field_callback() {
 
 function haiplugin_wp_lang_detection_process_after_validation( $fields, $entry, $form_data ) {
     $plugin_enabled = get_option('haiplugin_wp_lang_detection_enabled');
-    $contactForm = get_option('haiplugin_wp_lang_detection_wp_form');
+    $contactFormId = absint( get_option('haiplugin_wp_lang_detection_wp_form') );
     $messageField = get_option('haiplugin_wp_lang_detection_wp_form_field');
     $authorization = get_option('haiplugin_wp_lang_detection_api_key');
     $endpoint = get_option('haiplugin_wp_lang_detection_endpoint_url');
@@ -441,7 +441,7 @@ function haiplugin_wp_lang_detection_process_after_validation( $fields, $entry, 
     }
 
     // Only run on the form with ID = 973
-    if ( absint( $form_data['id'] ) !== 973 ) {
+    if ( absint( $form_data['id'] ) !== $contactFormId ) {
         return;
     }
 
