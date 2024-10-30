@@ -496,7 +496,7 @@ function haiplugin_wp_lang_detection_process_after_validation( $fields, $entry, 
 
     // Check if the detected language is not English (for example)
     if ( $detected_language !== 'en' ) {
-        wpforms()->process->errors[ $form_data['id'] ][ $description_field_id ] = 'Field Description - '.$errorMessage;
+        wpforms()->process->errors[ $form_data['id'] ][ $description_field_id ] = $errorMessage;
     }
 }
 add_action( 'wpforms_process', 'haiplugin_wp_lang_detection_process_after_validation', 10, 3 );
