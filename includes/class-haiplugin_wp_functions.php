@@ -350,10 +350,10 @@ function haiplugin_wp_lang_detection_language_callback() {
 // Callback for Word Detection After
 function haiplugin_wp_lang_detection_word_count_callback() {
     $word_count = get_option('haiplugin_wp_lang_detection_word_count', '5 Words');
-    $options = ["1 Word", "2 Words", "3 Words", "4 Words", "5 Words", "6 Words", "7 Words", "8 Words", "9 Words", "10 Words"];
+    $options = [5,10,15,20,30,40,50,60,75,100];
     echo '<select name="haiplugin_wp_lang_detection_word_count">';
     foreach ($options as $option) {
-        echo '<option value="' . $option . '" ' . selected($word_count, $option, false) . '>' . $option . '</option>';
+        echo '<option value="' . $option . '" ' . selected($word_count, $option, false) . '>' . $option . ' Words</option>';
     }
     echo '</select>';
 }
