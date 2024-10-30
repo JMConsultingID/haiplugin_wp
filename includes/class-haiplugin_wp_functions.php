@@ -487,7 +487,7 @@ function haiplugin_wp_lang_detection_process_after_validation( $fields, $entry, 
 
     if ( is_wp_error( $response ) ) {
         // Handle error if API request fails
-        wpforms()->process->errors[ $form_data['id'] ][ $description_field_id ] = 'Error detecting language. Please try again.';
+        wpforms()->process->errors[ $form_data['id'] ][ $description_field_id ] = 'Error 503 - '.$errorMessage;
         return;
     }
 
@@ -496,7 +496,7 @@ function haiplugin_wp_lang_detection_process_after_validation( $fields, $entry, 
 
     // Check if the detected language is not English (for example)
     if ( $detected_language !== 'en' ) {
-        wpforms()->process->errors[ $form_data['id'] ][ $description_field_id ] = 'Description must be in English.';
+        wpforms()->process->errors[ $form_data['id'] ][ $description_field_id ] = 'Field Description - '.$errorMessage;
     }
 }
 add_action( 'wpforms_process', 'haiplugin_wp_lang_detection_process_after_validation', 10, 3 );
