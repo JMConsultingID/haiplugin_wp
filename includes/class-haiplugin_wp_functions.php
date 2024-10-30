@@ -441,7 +441,7 @@ function haiplugin_wp_lang_detection_process_after_validation( $fields, $entry, 
     }
 
     // Only run on the form with ID = 973
-    if ( absint( $form_data['id'] ) !== $contactForm ) {
+    if ( absint( $form_data['id'] ) !== 973 ) {
         return;
     }
 
