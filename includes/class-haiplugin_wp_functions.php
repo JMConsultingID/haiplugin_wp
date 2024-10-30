@@ -480,7 +480,7 @@ function haiplugin_wp_lang_detection_process_after_validation( $fields, $entry, 
             'attributes_as_list'     => false,
             'show_base_64'           => false,
             'show_original_response' => false,
-            'providers'              => ['google'],
+            'providers'              => [$providerName],
             'text'                   => $description
         ))
     ));
@@ -492,7 +492,7 @@ function haiplugin_wp_lang_detection_process_after_validation( $fields, $entry, 
     }
 
     $body = json_decode( wp_remote_retrieve_body( $response ), true );
-    $detected_language = $body['google']['items'][0]['language'] ?? '';
+    $detected_language = $body[$providerName]['items'][0]['language'] ?? '';
 
     // Check if the detected language is not English (for example)
     if ( $detected_language !== 'en' ) {
